@@ -22,15 +22,21 @@
 	
 					    	<b-col cols="3">
 
-					    		<!-- Keyword search box here -->
-					    		<div style="margin-left: 1em;">
+					    		<!-- Keywords search box here -->
+					    		<div style="margin-left: 1em; margin-top: 2em;">
+					    			<b-form-input class="wfs_search_box" size="lg" placeholder="Search Keywords...">		
+					    			</b-form-input>
+					    		</div>
+
+					    		<!-- <div style="margin-left: 1em; margin-top: 2em;">
 					    			<b-button class="wfs_search_box" variant="outline-secondary" size="lg">
-					    				<span style="float: left;">Search</span>
+					    				<span style="float: left;">Search Keywords</span>
 					    				<span style="float: right;">
 					    					<icon name="search" scale="1.25"></icon>
 					    				</span>
 					    			</b-button>
-					    		</div>
+					    			</b-form-input>
+					    		</div> -->
 
 						    </b-col>
 
@@ -80,7 +86,7 @@
 
 							<!-- Back to previous page button -->
 							<b-col cols="3" style="margin-left: 3em;">
-								<b-button @click="switchToPreviousPage" size="lg" style="float: right;">
+								<b-button @click="switchToPreviousPage" size="lg" style="float: right;" disabled>
 									<span>&nbsp;Back to previous page</span>
 								</b-button>
 							</b-col>
@@ -157,7 +163,8 @@
 					<b-col class="wfs_sidebar_column" cols="3">
 						
 						<div :style="{ height: viewportHeight, overflowY: 'scroll' }" class="wfs_shadowed_cards">
-							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchmethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName">
+							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchmethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName"
+							:roleList="myRoleList">
 								
 							</component>
 						</div>
@@ -177,6 +184,7 @@
 
 // Bootstrap components
 import bImg from "bootstrap-vue/es/components/image/img";
+import bFormInput from "bootstrap-vue/es/components/form-input/form-input";
 import bButton from "bootstrap-vue/es/components/button/button";
 
 // Bootstrap grid layout
@@ -214,6 +222,7 @@ export default {
 	components: {
 
 		"b-button": bButton,
+		"b-form-input": bFormInput,
 		"b-img": bImg,
 
 		"b-container": bContainer,
@@ -238,6 +247,7 @@ export default {
 			childCardType: "",
 			coOccurrences: {},
 			myCardList: [],
+			myRoleList: [],
 
 			// Used for children name reference to parent
 			myComponentName: "wfs-keyword",
@@ -365,8 +375,75 @@ export default {
 			// this.switchMethod(this.previousPage);
 			this.$router.go(-1);
 
-			// Force reload
-			// window.location.reload(true);
+	        // Routing goes through Scrapbooklevel create (NOTE: probably because it's at the top level of the App - should look into why)
+	        if ( this.$route ) {
+
+	            // Person routing
+	            if ( this.$route.params.personID ) {
+
+	                this.cp.currentPerson = 
+	                    this.cp.peopleJSON[this.$route.params.personID];
+	                this.switchMethod("wfs-person");
+	            } 
+	            // Place routing
+	            else if ( this.$route.params.placeID ) {
+
+	                this.cp.currentPlace = 
+	                    this.cp.placesJSON[this.$route.params.placeID];
+	                this.switchMethod("wfs-place");
+	            } 
+	            // Source routing
+	            else if ( this.$route.params.sourceID) {
+
+	                this.cp.currentSource = 
+	                    this.cp.sourcesJSON[this.$route.params.sourceID];
+	                this.switchMethod("wfs-source");
+	            } 
+	            // Keyword routing
+	            else if ( this.$route.params.keywordID ) {
+
+	                this.cp.currentKeyword = this.cp.collection.ids_to_keywords[this.$route.params.keywordID];
+	                this.switchMethod("wfs-keyword");
+	            }
+	            // Page routing
+	            else if ( this.$route.params.pageNumber ) {
+
+	                this.cp.bookNumber = this.$route.params.bookNumber;
+	                //this.currentlyExaminedEntry = "Scrapbook " + this.cp.bookNumber;
+	                this.cp.currentEntry = this.cp.myJSON[this.cp.bookNumber].book;
+	                this.cp.pageIndex = parseInt(this.$route.params.pageNumber);                
+	                this.switchMethod("wfs-pagelevel");
+	            } 
+	            // Collection or book routing
+	            else {
+
+	                // if ( this.$route.params.bookNumber ) {
+
+	                //     this.currentlyExaminedEntry = "Scrapbook " + this.$route.params.bookNumber;
+	                //     this.selectScrapbook(this.$route.params.bookNumber);
+
+	                //     // Start navbar color with the spine color from scrapbook 1
+	                //     this.setNavbarToSpineColor();
+
+	                //     // Set background color with the cover color from scrapbook 1
+	                //     this.setBackgroundColorToCoverColor();  
+	                // } else { 
+
+	                //     // Switch currently examined field to collection
+	                //     this.currentlyExaminedEntry = "Collection";
+
+	                //     // Set the navbar to the default black for the collection
+	                //     this.setNavbarToCollectionColor();
+
+	                //     // Set the background to paper color if in collection view
+	                //     this.setBackgroundColorToPaperColor()
+	                // }
+
+	                this.switchMethod("wfs-scrapbooklevel");
+	            }
+	        }
+
+	        // this.$router.go(window.location.href);;	
 		},
 	},
 

@@ -179,12 +179,12 @@ export default {
 					this.cp.title = this.cp.currentPerson.name;
 					break;
 
-				case "wfs-person":
+				case "wfs-place":
 
 					this.cp.title = this.cp.currentPlace.name;
 					break;
 
-				case "wfs-person":
+				case "wfs-source":
 
 					this.cp.title = this.cp.currentSource.name;
 					break;

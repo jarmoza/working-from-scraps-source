@@ -38,7 +38,7 @@
 			</b-row>
 
 			<!-- Search box -->
-			<b-row style="margin-bottom: 1em;">
+			<b-row style="margin-bottom: 1em; margin-top: 1em;">
 
 				<b-col cols="8"></b-col>
 					

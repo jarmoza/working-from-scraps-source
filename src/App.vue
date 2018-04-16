@@ -203,12 +203,17 @@ button {
 
 .wfs_search_box {
     
-    background-color: rgba(0,0,0,0) !important;
+    background-color: #E8E8E8 !important;
     /*color: 6C757D;*/
-    color: black;
+    color: grey;
     border-color: black !important;
     border-width: 2px;
     width: 100%;
+}
+
+.wfs_search_box:hover {
+
+    color: grey;
 }
 
 textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {   

@@ -80,7 +80,7 @@
 
 							<!-- Back to previous page button -->
 							<b-col cols="3" style="margin-left: 3em; margin-top: 2em;">
-								<b-button @click="switchToPreviousPage" size="lg" style="float: right;" disabled>
+								<b-button @click="switchToPreviousPage" size="lg" style="float: right;">
 									<span>&nbsp;Back to previous page</span>
 								</b-button>
 							</b-col>
@@ -365,19 +365,14 @@ export default {
 			this.clearSideBar();
 
 			// Switch back to the page that brough the user to this person page
-			this.switchMethod(this.previousPage);
+			// this.switchMethod(this.previousPage);
+			this.$router.go(-1);
+
+			// Force reload
+			// window.location.reload(true);
 		},
 	},
-
-	// Hooks
-	created() {
-
-		if ( this.$route && this.$route.params.peopleID ) {
-
-		}
-
-	},
-
+	
 }
 </script>
 

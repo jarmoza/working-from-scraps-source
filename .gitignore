@@ -3,6 +3,19 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
+404.html
+notes/
+src/assets/book1.png
+src/assets/book9.png
+src/assets/book12.png
+src/assets/images/book_fold.png
+src/assets/json/read_places.py
+src/assets/*.json
+src/assets/*.otf
+src/components/unused/
+src/wfs_store.js
+src/d3.wordcloud.js
+src/D3/
 
 # Editor directories and files
 .idea

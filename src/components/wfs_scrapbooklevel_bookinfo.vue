@@ -49,15 +49,12 @@
                     </b-col>
 
                 </b-row>
-                    <br />
+
+                <br />
+
                 <b-row>
-
                     <b-col cols="12">
-
-                        
-
                     </b-col>
-
                 </b-row>
 
             </b-col>

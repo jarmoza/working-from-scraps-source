@@ -195,6 +195,11 @@ export default {
 
 					this.pageIndex = index;
 					this.cp.pageIndex = index;
+					this.$router.push({ 
+    					name: "Page",
+    					params: { bookNumber: this.cp.currentEntry.number,
+    							  pageNumber: index }
+					});
 				}
 			}
 		},

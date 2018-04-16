@@ -24,11 +24,6 @@
 import bRow from "bootstrap-vue/es/components/layout/row";
 import bCol from "bootstrap-vue/es/components/layout/col";
 
-// Third party
-// import Chartist from "chartist";
-
-// Vue.use(Chartist);
-
 
 export default {
 
@@ -53,7 +48,7 @@ export default {
 				fontSize: "1em",
 				opacity: "1", 
 				backgroundColor: "#E8E8E8", 
-				chartArea: { width: "150%" }, 
+				chartArea: { width: "150%", height: "150%" }, 
 				legend: { position: "labeled"},
 				titleTextStyle: { 
 

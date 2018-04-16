@@ -147,27 +147,30 @@ export default {
 
 				case "wfs-pagelevel":
 					
-					this.cp.title = "Scrapbook " + this.cp.currentEntry.number;
-					// this.setPageLevelNavbarSpineColor();
+					this.cp.title = "Scrapbook " + this.cp.currentEntry.number;	
 					this.setBackgroundColorToPageColor();
+
 					break;
 
 				case "wfs-scrapbooklevel":
 	
 					this.cp.title = "Working from Scraps";
 
-					this.setNavbarToSpineColor();
-					this.setBackgroundColorToCoverColor();
-
-					if ( "Collection" == this.currentlyExaminedEntry ) {
+					if ( this.$route.params.bookNumber ) {
 						
-						this.$router.push({ name: "Collection" });
-					} else { 
+						this.setNavbarToSpineColor();
+						this.setBackgroundColorToCoverColor();
 
 						this.$router.push({ 
 							name: "Book",
 							params: { bookNumber: this.cp.currentEntry.number },
 						});
+					} else { 
+
+						this.setNavbarToCollectionColor();
+						this.setBackgroundColorToPageColor();
+
+						this.$router.push({ name: "Collection" });
 					}
 					break;
 
@@ -204,6 +207,17 @@ export default {
 
         	$("body").css("background-color", "rgb(217, 204, 187)");
         },
+
+        setNavbarToCollectionColor: function() {
+
+            // Workaround to override color via jQuery
+            let cp = this.cp;
+            $("#scrapbooklevel_navbar").each(function(){
+
+                this.style.setProperty("background-color", 
+                    "rgb(35, 43, 43)", "important");
+            });
+        },        
 
         setNavbarToSpineColor: function() {
 

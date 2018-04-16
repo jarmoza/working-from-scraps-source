@@ -460,7 +460,7 @@ export default {
                 if ( this.$route.params.bookNumber ) {
 
                     this.currentlyExaminedEntry = "Scrapbook " + this.$route.params.bookNumber;
-                    this.selectScrapbook(this.currentlyExaminedEntry);
+                    this.selectScrapbook(this.$route.params.bookNumber);
 
                     // Start navbar color with the spine color from scrapbook 1
                     this.setNavbarToSpineColor();
@@ -469,9 +469,17 @@ export default {
                     this.setBackgroundColorToCoverColor();  
                 } else { 
 
+                    // Switch currently examined field to collection
+                    this.currentlyExaminedEntry = "Collection";
+
+                    // Set the navbar to the default black for the collection
+                    this.setNavbarToCollectionColor();
+
                     // Set the background to paper color if in collection view
                     this.setBackgroundColorToPaperColor()
                 }
+
+                this.switchMethod("wfs-scrapbooklevel");
             } 
         }    
     },

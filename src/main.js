@@ -1,10 +1,14 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+
+// Third-party libraries and components
 import BootstrapVue from "bootstrap-vue";
 import VueChartkick from "vue-chartkick";
-// import Chart from "chart.js";
+
+// Main VueJS app
 import App from "./App.vue";
 
+// 'Working from Scraps' components
 import WfsKeyword from "./components/wfs_keyword.vue";
 import WfsPagelevel from "./components/wfs_pagelevel.vue";
 import WfsPerson from "./components/wfs_person.vue";
@@ -18,84 +22,96 @@ Vue.use(VueRouter);
 // Tell Vue to use Chartkick - Google Charts
 Vue.use(VueChartkick, {adapter: ""});
 
-// ChartJS globals
-// Chart.defaults.global.defaultFontFamily = "Raleway";
-// Chart.defaults.global.defaultFontSize = "1em";
-// Chart.defaults.global.defaultFontColor = "grey";
-
-// Tell Vue to use Chartist
-// Vue.use(require("vue-chartist"));
-
-// Browser rsouting to components
+// Browser routing to components
 const routes = [
 
+    // Home redirects to /collection
     { 
-        name: "Home", 
-        path: "/", 
-        component: WfsScrapbooklevel 
-    },
- 	   
-    { 
-    	name: "Collection", 
-    	path: "/wfsscrapbooklevel", 
-    	alias: "/collection", 
-    	component: WfsScrapbooklevel 
+  		path: "/", 
+  		name: "home",
+        redirect: "/collection" 
     },
 
-  	{ 
-  		name: "Book", 
-  		path: "/wfsscrapbooklevel/:bookNumber", 
-  		alias: "/collection/book/:bookNumber", 
-  		component: WfsScrapbooklevel 
-  	},
-
-  	{ 
-  		name: "Page", 
-  		path: "/wfspagelevel/:bookNumber/:pageNumber", 
-  		alias: "/collection/book/:bookNumber/page/:pageNumber", 
-  		component: WfsPagelevel 
-  	},
-
-  	{ 
-  		name: "Person", 
-  		path: "/wfsperson/:personID", 
-  		alias: "/collection/person/:personID", 
-  		component: WfsPerson 
-  	},
-
-  	{ 
-  		name: "Place", 
-  		path: "/wfsplace/:placeID", 
-  		alias: "/collection/place/:placeID", 
-  		component: WfsPlace 
-  	},
-
-  	{ 
-  		name: "Source", 
-  		path: "/wfssource/:sourceID", 
-  		alias: "/collection/source/:sourceID", 
-  		component: WfsSource 
-  	},
-
+    // Default routing url
     {
-        name: "Keyword",
-        path: "wfskeyword/:keywordID",
-        alias: "/collection/keyword/:keywordID",
-        component: WfsKeyword
+        path: "/collection",
+        name: "collection",
+        component: WfsScrapbooklevel,
+        props: true
     },
+
+  	{ 
+        path: "/collection/book/:bookNumber",
+        name: "book",	   
+        component: WfsScrapbooklevel,
+        props: true
+
+        // path: "/wfsscrapbooklevel/:bookNumber", 
+        // alias: "/collection/book/:bookNumber",	  
+  	},
+
+  	{ 
+        path: "/collection/book/:bookNumber/page/:pageNumber",
+        name: "page", 
+        component: WfsPagelevel,
+        props: true
+
+    	// path: "/wfspagelevel/:bookNumber/:pageNumber", 
+    	// alias: "/collection/book/:bookNumber/page/:pageNumber",        
+  	},
+
+  	{ 
+        path: "/collection/person/:personID",
+        name: "person",         
+  		  component: WfsPerson,
+        props: true
+
+        // path: "/wfsperson/:personID", 
+        // alias: "/collection/person/:personID",         
+  	},
+
+  	{ 
+        path: "/collection/place/:placeID",
+        name: "place", 
+  		component: WfsPlace,
+        props: true,
+
+        // path: "/wfsplace/:placeID", 
+        // alias: "/collection/place/:placeID",        
+  	},
+
+  	{ 
+        path: "/collection/source/:sourceID",
+        name: "source",
+        component: WfsSource,
+        props: true
+
+        // path: "/wfssource/:sourceID", 
+        // alias: "/collection/source/:sourceID",      
+  	},
+
+	{
+		path: "/collection/keyword/:keywordID",
+		name: "keyword",        
+		component: WfsKeyword,
+        props: true,
+        
+        // path: "wfskeyword/:keywordID",
+        // alias: "/collection/keyword/:keywordID",        
+	},
 ];
 
 const router = new VueRouter({
  	
-    routes: routes,
-    mode: "history",
+	routes: routes,
+	mode: "history",
 });
 
 var myVue = new Vue({
 
 	el: "#app",
 	render: h => h(App),
-	router
+	router: router
 });
 
 

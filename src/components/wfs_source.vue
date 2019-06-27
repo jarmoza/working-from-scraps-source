@@ -20,13 +20,13 @@
 
 						<b-row style="margin-bottom: 0.5em; margin-top: 1em; margin-left: 0em;">
 	
-					    	<b-col cols="3">
+					    	<!-- <b-col cols="3"> -->
 
 					    		<!-- Sources search box here -->
-					    		<div style="margin-left: 1em; margin-top: 2em;">
+					    		<!-- div style="margin-left: 1em; margin-top: 2em;">
 					    			<b-form-input class="wfs_search_box" size="lg" placeholder="Search Sources...">		
 					    			</b-form-input>
-					    		</div>
+					    		</div> -->
 
 					    		<!-- <div style="margin-left: 1em; margin-top: 2em;">
 					    			<b-button class="wfs_search_box" variant="outline-secondary" size="lg">
@@ -38,10 +38,10 @@
 					    			</b-form-input>
 					    		</div> -->					    		
 
-						    </b-col>
+						    <!-- </b-col> -->
 
 							<!-- Places, Sources icons -->
-							<b-col cols="5">
+							<b-col cols="6">
 
 				    			<b-row>
 				    				<b-col cols="12">
@@ -49,7 +49,7 @@
 				    				</b-col>
 				    			</b-row>								
 								
-								<b-row>
+								<b-row style="margin-top: 0.5em;">
 
 									<!-- People icon -->
 									<b-col cols="2" class="wfs_pps_icon_box">
@@ -84,16 +84,19 @@
 
 							</b-col>
 
-							<!-- Back to previous page button -->
+
+							<b-col cols="2"></b-col>
+
+							<!-- Back to collection button -->
 							<b-col cols="3" style="margin-left: 3em; margin-top: 2em;">
-								<b-button @click="switchToPreviousPage" size="lg" style="float: right;" disabled>
-									<span>&nbsp;Back to previous page</span>
+								<b-button @click="backToCollection" size="lg" style="float: right;">
+									<span>&nbsp;Back to Collection</span>
 								</b-button>
 							</b-col>
 
 						</b-row>
 
-						<!-- Place information -->
+						<!-- Source information -->
 						<b-row style="margin-left: 1em !important;">
 
 							<b-col cols="12">
@@ -111,9 +114,16 @@
 
 												<wfs-metadata label="Place" :value="cp.currentSource.place"></wfs-metadata>
 												<wfs-metadata label="Date" :value="cp.currentSource.date"></wfs-metadata>
+												<wfs-metadata label="Creator(s)" :value="creatorsList"></wfs-metadata>
+												<wfs-metadata label="Notes on creator(s)" :value="creatorsNotesList"></wfs-metadata>
 												<wfs-metadata label="Rights holder" :value="cp.currentSource.rights_holder"></wfs-metadata>
 												<wfs-metadata label="Type" :value="cp.currentSource.source_type"></wfs-metadata>
-												<wfs-metadata label="More information" :value="cp.currentSource.link" is-link></wfs-metadata>
+												<!-- <wfs-metadata label="More information" :value="cp.currentSource.link" is-link></wfs-metadata> -->
+												<div style="padding-top: 1em;">
+													<wfs-metadata-button value="On the Internet" :href="cp.currentSource.link" isLink>
+														<img :src="linkIcon" title="More information on this source" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+													</wfs-metadata-button>
+												</div>
 												<wfs-metadata v-if="cp.currentSource.notes.length > 0" label="Notes" :value="' '">
 					            					<wfs-read-more more-str="read more" :text="cp.currentSource.notes" link="#" less-str="read less" :max-chars="maxCharsReadMore"></wfs-read-more>
 					            				</wfs-metadata>
@@ -165,13 +175,22 @@
 							</b-col>
 
 						</b-row>
+
+						<!-- Sources search -->
+						<b-row class="wfs_page_content" style="margin-left: 1em !important;">
+							<b-col cols="12">
+								<div class="wfs_page_component" style="padding: 2em 2em 1em 2em;">
+									<wfs-ppsk-data-area :cp="cp" ppskType="sources" level="collection" chartType="none" :barColor="cp.bookCoverColors['12'].spine" pieScale="100%"></wfs-ppsk-data-area>
+								</div>
+							</b-col>
+						</b-row>						
 					</b-col>
 
 					<!-- Sidebar -->
 					<b-col class="wfs_sidebar_column" cols="3">
 						
 						<div :style="{ height: viewportHeight, overflowY: 'scroll' }" class="wfs_shadowed_cards">
-							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchmethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName"
+							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchMethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName"
 							:roleList="myRoleList">
 								
 							</component>
@@ -202,11 +221,13 @@ import bCol from "bootstrap-vue/es/components/layout/col";
 
 // WFS components
 import wfsMetadata from "./wfs_metadata.vue";
+import wfsMetadataButton from "./wfs_metadata_button.vue";
 import wfsNav from "./wfs_nav.vue";
 import wfsPersonCard from "./wfs_person_card.vue";
 import wfsPPSKFeatured from "./wfs_ppsk_featured.vue";
 import wfsPlaceCard from "./wfs_place_card.vue";
 import wfsSourceCard from "./wfs_source_card.vue";
+import wfsPPSKDataArea from "./wfs_ppsk_data_area.vue";
 
 // Third party components
 import wfsReadMore from "./wfs_read_more.vue";
@@ -216,15 +237,35 @@ import "vue-awesome/icons/Search";
 
 export default {
 
-	name: "wfs-person",
+	name: "wfs-source",
 
-	props: ["cp", "previousPage", "switchMethod"],
+	props: ["cp", "switchMethod"],
 
 	computed: {
 
+		creatorsList: function() {
+
+			let creators = [];
+			for ( let index = 0; index < this.cp.currentSource.stats.creators.length; index++ ) {
+				creators.push(this.cp.peopleJSON[this.cp.currentSource.stats.creators[index]].name);
+			}
+
+			return creators.join(", ");
+		},
+
+		creatorsNotesList: function() {
+
+			let creators_notes = [];
+			for ( let index = 0; index < this.cp.currentSource.stats.creators_notes.length; index++ ) {
+				creators_notes.push(this.cp.peopleJSON[this.cp.currentSource.stats.creators_notes[index]].name);
+			}
+
+			return creators_notes.join(", ");
+		},		
+
 		viewportHeight: function() {
 
-			return "90vh";
+			return "100%";
 		}
 	},
 
@@ -239,16 +280,25 @@ export default {
 		"b-col": bCol,
 
 		"wfs-metadata": wfsMetadata,
+		"wfs-metadata-button": wfsMetadataButton,
 		"wfs-nav": wfsNav,
 
 		"wfs-person-card": wfsPersonCard,
 		"wfs-place-card": wfsPlaceCard,
 		"wfs-source-card": wfsSourceCard,
 
+		"wfs-ppsk-data-area": wfsPPSKDataArea,
 		"wfs-ppsk-featured": wfsPPSKFeatured,
 
 		"icon": Icon,
 	},
+
+	created() {
+
+		if ( !this.cp.currentSource ) {
+			this.cp.currentSource = this.cp.sourcesJSON[this.$route.params.sourceID];
+		}
+	},	
 
 	data() {
 		
@@ -260,7 +310,9 @@ export default {
 			myRoleList: [],
 
 			// Used for children name reference to parent
-			myComponentName: "wfs-place",			
+			myComponentName: "wfs-place",
+
+			linkIcon: "/src/assets/images/link_icon_white.png"
 		};
 	},
 
@@ -271,6 +323,11 @@ export default {
 
 			this.myCardList.push(p_json);
 		},
+
+        backToCollection: function() {
+
+            this.switchMethod("wfs-scrapbooklevel");
+        },			
 
 		clearSideBar: function() {
 
@@ -283,7 +340,7 @@ export default {
 
 			let myPPSIDs = null;
 			let myCoOccurrences = {};
-			let myPerson = this.cp.currentPerson;
+			let mySource = this.cp.currentSource;
 
 			// Change active card type
 			this.childCardType = p_type;
@@ -291,20 +348,20 @@ export default {
 			// Clear the side bar of cards
 			this.clearSideBar();
 
-			// Get a ref. to the corresponding place/source collection of co-occurring IDs for this person
+			// Get a ref. to the corresponding place/source collection of co-occurring IDs for this source
 			switch ( p_type ){
 
 				case "wfs-person-card":
-					myPPSIDs = myPerson.stats.people_ids;
-					myCoOccurrences = myPerson.stats.people_on_pages_dict;
+					myPPSIDs = mySource.stats.people_ids;
+					myCoOccurrences = mySource.stats.people_on_pages_dict;
 					break;
 				case "wfs-place-card":
-					myPPSIDs = myPerson.stats.places_ids;
-					myCoOccurrences = myPerson.stats.places_on_pages_dict;
+					myPPSIDs = mySource.stats.places_ids;
+					myCoOccurrences = mySource.stats.places_on_pages_dict;
 					break;
 				case "wfs-source-card":
-					myPPSIDs = myPerson.stats.sources_ids;
-					myCoOccurrences = myPerson.stats.sources_on_pages_dict;
+					myPPSIDs = mySource.stats.sources_ids;
+					myCoOccurrences = mySource.stats.sources_on_pages_dict;
 					break;
 			}
 
@@ -373,85 +430,88 @@ export default {
 			return pageCount;
 		},
 
-		switchToPreviousPage: function() {
+		// switchToPreviousPage: function() {
 
-			// Clear the sidebar of cards
-			this.clearSideBar();
+		// 	console.log("Source switch previous page");
 
-			// Switch back to the page that brough the user to this place page
-			// this.switchMethod(this.previousPage);
-			this.$router.go(-1);
+		// 	// Clear the sidebar of cards
+		// 	this.clearSideBar();
 
-	        // Routing goes through Scrapbooklevel create (NOTE: probably because it's at the top level of the App - should look into why)
-	        if ( this.$route ) {
+		// 	// Switch back to the page that brough the user to this place page
+		// 	this.$router.go(-1);
 
-	            // Person routing
-	            if ( this.$route.params.personID ) {
+	 //        // Routing goes through Scrapbooklevel create (NOTE: probably because it's at the top level of the App - should look into why)
+	 //        switch ( this.$route.name ) {
 
-	                this.cp.currentPerson = 
-	                    this.cp.peopleJSON[this.$route.params.personID];
-	                this.switchMethod("wfs-person");
-	            } 
-	            // Place routing
-	            else if ( this.$route.params.placeID ) {
+	 //            // Person routing
+	 //            if ( this.$route.params.personID ) {
 
-	                this.cp.currentPlace = 
-	                    this.cp.placesJSON[this.$route.params.placeID];
-	                this.switchMethod("wfs-place");
-	            } 
-	            // Source routing
-	            else if ( this.$route.params.sourceID) {
+	 //                this.cp.currentPerson = 
+	 //                    this.cp.peopleJSON[this.$route.params.personID];
+	 //                this.switchMethod("wfs-person");
+	 //            } 
+	 //            // Place routing
+	 //            else if ( this.$route.params.placeID ) {
 
-	                this.cp.currentSource = 
-	                    this.cp.sourcesJSON[this.$route.params.sourceID];
-	                this.switchMethod("wfs-source");
-	            } 
-	            // Keyword routing
-	            else if ( this.$route.params.keywordID ) {
+	 //                this.cp.currentPlace = 
+	 //                    this.cp.placesJSON[this.$route.params.placeID];
+	 //                this.switchMethod("wfs-place");
+	 //            } 
+	 //            // Source routing
+	 //            else if ( this.$route.params.sourceID ) {
 
-	                this.cp.currentKeyword = this.cp.collection.ids_to_keywords[this.$route.params.keywordID];
-	                this.switchMethod("wfs-keyword");
-	            }
-	            // Page routing
-	            else if ( this.$route.params.pageNumber ) {
+	 //                this.cp.currentSource = 
+	 //                    this.cp.sourcesJSON[this.$route.params.sourceID];
+	 //                this.switchMethod("wfs-source");
+	 //            } 
+	 //            // Keyword routing
+	 //            else if ( this.$route.params.keywordID ) {
 
-	                this.cp.bookNumber = this.$route.params.bookNumber;
-	                //this.currentlyExaminedEntry = "Scrapbook " + this.cp.bookNumber;
-	                this.cp.currentEntry = this.cp.myJSON[this.cp.bookNumber].book;
-	                this.cp.pageIndex = parseInt(this.$route.params.pageNumber);                
-	                this.switchMethod("wfs-pagelevel");
-	            } 
-	            // Collection or book routing
-	            else {
+	 //                this.cp.currentKeyword = this.cp.collection.ids_to_keywords[this.$route.params.keywordID];
+	 //                this.switchMethod("wfs-keyword");
+	 //            }
+	 //            // Page routing
+	 //            else if ( this.$route.params.pageNumber ) {
 
-	                // if ( this.$route.params.bookNumber ) {
+	 //                this.cp.bookNumber = this.$route.params.bookNumber;
+	 //                // this.currentlyExaminedEntry = "Scrapbook " + this.cp.bookNumber;
+	 //                this.cp.currentEntry = this.cp.myJSON[this.cp.bookNumber].book;
+	 //                this.cp.pageIndex = parseInt(this.$route.params.pageNumber);                
+	 //                this.switchMethod("wfs-pagelevel");
+	 //            } 
+	 //            // Collection or book routing
+	 //            else {
 
-	                //     this.currentlyExaminedEntry = "Scrapbook " + this.$route.params.bookNumber;
-	                //     this.selectScrapbook(this.$route.params.bookNumber);
+	 //                // if ( this.$route.params.bookNumber ) {
 
-	                //     // Start navbar color with the spine color from scrapbook 1
-	                //     this.setNavbarToSpineColor();
+	 //                //     this.currentlyExaminedEntry = "Scrapbook " + this.$route.params.bookNumber;
+	 //                //     this.selectScrapbook(this.$route.params.bookNumber);
 
-	                //     // Set background color with the cover color from scrapbook 1
-	                //     this.setBackgroundColorToCoverColor();  
-	                // } else { 
+	 //                //     // Start navbar color with the spine color from scrapbook 1
+	 //                //     this.setNavbarToSpineColor();
 
-	                //     // Switch currently examined field to collection
-	                //     this.currentlyExaminedEntry = "Collection";
+	 //                //     // Set background color with the cover color from scrapbook 1
+	 //                //     this.setBackgroundColorToCoverColor();  
+	 //                // } else { 
 
-	                //     // Set the navbar to the default black for the collection
-	                //     this.setNavbarToCollectionColor();
+	 //                //     // Switch currently examined field to collection
+	 //                //     this.currentlyExaminedEntry = "Collection";
 
-	                //     // Set the background to paper color if in collection view
-	                //     this.setBackgroundColorToPaperColor()
-	                // }
+	 //                //     // Set the navbar to the default black for the collection
+	 //                //     this.setNavbarToCollectionColor();
 
-	                this.switchMethod("wfs-scrapbooklevel");
-	            }
-	        }
+	 //                //     // Set the background to paper color if in collection view
+	 //                //     this.setBackgroundColorToPaperColor()
+	 //                // }
 
-	        // this.$router.go(window.location.href);;
-		},
+	 //                this.switchMethod("wfs-scrapbooklevel");
+	 //            }
+
+	 //            this.$forceUpdate();
+	 //        }
+
+	 //        // this.$router.go(window.location.href);;
+		// },
 	},
 
 }

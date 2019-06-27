@@ -76,6 +76,12 @@
 			            		</p> -->
 			            	</wfs-metadata>
 			            	
+			            	<!-- <wfs-metadata label="UKAT Keywords" :value="ukatKeywords"></wfs-metadata> -->
+
+			            	<wfs-metadata label="UKAT Keywords" :value="' '">
+			            		<wfs-read-more more-str="read more" :text="ukatKeywords" link="#" less-str="read less" :max-chars="maxCharsReadMore"></wfs-read-more>
+			            	</wfs-metadata>
+
 			            	<wfs-metadata label="Foldout" :value="currentPage.foldout"></wfs-metadata>
 			            	<wfs-metadata label="Clipping orientations" 
 			            		:value="currentPage.orientations.join(', ')"></wfs-metadata>
@@ -148,6 +154,7 @@ export default {
 			maxCharsReadMore: 200,
 			pageIndex: 0,
 			keywordRouteStr: "",
+			ukatKeywords: ""
 		};
 	},
 
@@ -196,7 +203,7 @@ export default {
 					this.pageIndex = index;
 					this.cp.pageIndex = index;
 					this.$router.push({ 
-    					name: "Page",
+    					name: "page",
     					params: { bookNumber: this.cp.currentEntry.number,
     							  pageNumber: index }
 					});
@@ -217,6 +224,11 @@ export default {
 	        this.keywordRouteStr = keywordRouteList.join(", ");
 		},
 
+		createUkatKeywordsStr: function() {
+			
+			this.ukatKeywords = this.currentPage.ukat_keywords.join(", ");
+		},						
+
 		hasCommaForKeyword: function(p_keyword) {
 
 			return ( p_keyword == this.currentPage.keywords[this.currentPage.keywords.length - 1] ) ? "" : ", "
@@ -227,12 +239,18 @@ export default {
 
 		// Create the keyword links for this page
 		this.createKeywordRouteStr();
+
+		// Create the UKAT keyword links for this page
+		this.createUkatKeywordsStr();
 	},
 
 	updated() {
 
 		// Update the keyword links for this page
 		this.createKeywordRouteStr();
+
+		// Create the UKAT keyword links for this page
+		this.createUkatKeywordsStr();		
 	},
 
 }
@@ -264,6 +282,11 @@ export default {
 	/*font-weight: bold;*/
 	border-width: 2px;
 	border-color: black;
+}
+
+.desc_paragraph {
+	line-height: 1.5em;
+	margin-bottom: 0.5em;
 }
 
 .dropdown-item:hover {

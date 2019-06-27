@@ -3,7 +3,6 @@
 	<div style="margin-bottom: 2em;">
 
 
-
 		<!-- Bar type data area represents a collection overview visualization + table combo -->
 		<div v-if="'bar' == chartType">
 			
@@ -25,7 +24,7 @@
 
 				<!-- Bar -->
 				<b-col cols="6" >
-					<wfs-bar-chart :myData="barData" myLabel="" :myColors="barColors" style="padding: 0; width: 100%; display: inline;" xAxisLabel="Scrapbook"></wfs-bar-chart>
+					<wfs-bar-chart :myData="barData" :myLabel="barLabel" :myColors="barColors" style="padding: 0; width: 100%; display: inline;" xAxisLabel=""></wfs-bar-chart>
 				</b-col>
 
 				<!-- Pie -->
@@ -145,6 +144,61 @@
 
 			</b-row>
 		</div>
+
+		<!-- No chart, just table -->
+		<div v-else>
+
+			<b-row>
+
+				<!-- Search box and Data table -->
+				<b-col cols="12">
+
+					<!-- Label and Search box -->
+					<b-row style="margin-bottom: 1em;">
+
+						<b-col cols="6">
+							<span style="float: left; color: gray; font-size: 1.35em; font-weight: bold;" class="wfs_page_header">{{ nonChartPlainTextLabel }}</span>
+						</b-col>
+
+						<b-col cols="6">
+							<span style="">
+								<b-form-group horizontal label="" class="mb-0">
+							    	<b-input-group>
+							            <b-form-input v-model="filter" :placeholder="plainTextSearchLabel" class="wfs_pps_search_box" />
+							            <!-- <b-input-group-append>
+							              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+							            </b-input-group-append> -->
+							        </b-input-group>
+							    </b-form-group>
+							</span>
+						</b-col>
+
+					</b-row>
+
+					<!-- Data table -->
+					<b-row>
+
+						<b-col cols="12" style="border: 1px solid black; padding: 0 1em 0 1em;">
+							
+							<b-table striped hover responsive fixed
+								:fields="fields"
+								:items="ppskItems" 
+								:sort-by.sync="sortBy"
+								:sort-desc.sync="sortDesc"
+								:sort-compare="sortName"
+								:filter="filter"
+								style="max-height: 37vh; min-height: 37vh;">
+								<span slot="name" slot-scope="data" v-html="data.value"></span>
+								<span slot="scrapbooks" slot-scope="data" v-html="data.value"></span>
+							</b-table>
+
+						</b-col>
+
+					</b-row>
+
+				</b-col>
+			</b-row>
+		</div>
 	</div>
 
 </template>
@@ -192,6 +246,7 @@ export default {
 
 		return {
 
+			barLabel: "Frequency by Book",
 			filter: null,
 			pieLabel: "",
 			sortDesc: false,
@@ -265,6 +320,34 @@ export default {
 			}
 
 			return myFields;
+		},
+
+		nonChartPlainTextLabel: function() {
+			
+			let myLabel = "" 
+
+			switch ( this.ppskType ) {
+
+				case "people":
+
+					myLabel = "Other People in the Collection (" + 
+						this.cp.currentEntry.stats.people_ids.length.toString() + ")";
+					break;
+
+				case "places":
+
+					myLabel = "Other Places in the Collection (" +
+						this.cp.currentEntry.stats.places_ids.length.toString() + ")";
+					break;
+
+				case "sources":
+
+					myLabel = "Other Identified Sources in the Collection (" +
+						this.cp.currentEntry.stats.sources_ids.length.toString() + ")";
+					break;
+			}
+
+			return myLabel;
 		},
 
 		noRecordsFilterText: function() {
@@ -425,7 +508,14 @@ export default {
 
 					myData = [
 
-						{ name: "",  data: [["1", this.cp.myJSON["1"].book.stats.people_ids.length], ["6", this.cp.myJSON["6"].book.stats.people_ids.length], ["9", this.cp.myJSON["9"].book.stats.people_ids.length], ["12", this.cp.myJSON["12"].book.stats.people_ids.length]] }
+						{ 
+							name: "",  
+							data: [
+								["1", this.cp.myJSON["1"].book.stats.people_ids.length, this.cp.myJSON["1"].book.stats.people_ids.length.toString() + " people"], 
+								["6", this.cp.myJSON["6"].book.stats.people_ids.length, this.cp.myJSON["6"].book.stats.people_ids.length.toString() + " people"], 
+								["9", this.cp.myJSON["9"].book.stats.people_ids.length, this.cp.myJSON["9"].book.stats.people_ids.length.toString() + " people"], 
+								["12", this.cp.myJSON["12"].book.stats.people_ids.length, this.cp.myJSON["12"].book.stats.people_ids.length.toString() + " people"]] 
+						}
 
 					];
 
@@ -437,10 +527,10 @@ export default {
 
 						{ name: "", 
 						  data: [
-							["1",  this.cp.myJSON["1"].book.stats.places_ids.length],
-							["6",  this.cp.myJSON["6"].book.stats.places_ids.length],
-							["9",  this.cp.myJSON["9"].book.stats.places_ids.length],
-							["12", this.cp.myJSON["12"].book.stats.places_ids.length]
+							["1",  this.cp.myJSON["1"].book.stats.places_ids.length, this.cp.myJSON["1"].book.stats.places_ids.length.toString() + " places"],
+							["6",  this.cp.myJSON["6"].book.stats.places_ids.length, this.cp.myJSON["6"].book.stats.places_ids.length.toString() + " places"],
+							["9",  this.cp.myJSON["9"].book.stats.places_ids.length, this.cp.myJSON["9"].book.stats.places_ids.length.toString() + " places"],
+							["12", this.cp.myJSON["12"].book.stats.places_ids.length, this.cp.myJSON["12"].book.stats.places_ids.length.toString() + " places"]
 						  ], 
 						},
 					];
@@ -453,10 +543,10 @@ export default {
 
 						{ name: "", 
 						  data: [
-							["1",  this.cp.myJSON["1"].book.stats.sources_ids.length],
-							["6",  this.cp.myJSON["6"].book.stats.sources_ids.length],
-							["9",  this.cp.myJSON["9"].book.stats.sources_ids.length],
-							["12", this.cp.myJSON["12"].book.stats.sources_ids.length]
+							["1",  this.cp.myJSON["1"].book.stats.sources_ids.length, this.cp.myJSON["1"].book.stats.sources_ids.length.toString() + " sources"],
+							["6",  this.cp.myJSON["6"].book.stats.sources_ids.length, this.cp.myJSON["6"].book.stats.sources_ids.length.toString() + " sources"],
+							["9",  this.cp.myJSON["9"].book.stats.sources_ids.length, this.cp.myJSON["9"].book.stats.sources_ids.length.toString() + " sources"],
+							["12", this.cp.myJSON["12"].book.stats.sources_ids.length, this.cp.myJSON["12"].book.stats.sources_ids.length.toString() + " sources"]
 						  ],
 						},
 					];
@@ -561,7 +651,7 @@ export default {
 
 			return myFields;
 
-		},
+		},		
 
 		pieData_Collection: function() {
 
@@ -762,7 +852,7 @@ export default {
 							if ( ppskID in this.cp.myJSONList[index].book.stats.people_ids_dict ) {
 
 								scrapAppears.push("<a href='/collection/book/" + 
-									this.cp.myJSONList[index].book.number + "/'>" + 
+									this.cp.myJSONList[index].book.number + "'>" + 
 									this.cp.myJSONList[index].book.number + "(" + 
 									this.cp.myJSONList[index].book.stats.people_ids_dict[ppskID] + ")</a>");
 							}
@@ -796,7 +886,7 @@ export default {
 								if ( ppskID in this.cp.myJSONList[index].book.stats.places_ids_dict ) {
 
 									scrapAppears.push("<a href='/collection/book/" + 
-										this.cp.myJSONList[index].book.number + "/'>" + 
+										this.cp.myJSONList[index].book.number + "'>" + 
 										this.cp.myJSONList[index].book.number + "(" + 
 										this.cp.myJSONList[index].book.stats.places_ids_dict[ppskID] + ")</a>");
 								}
@@ -830,7 +920,7 @@ export default {
 								if ( ppskID in this.cp.myJSONList[index].book.stats.sources_ids_dict ) {
 
 									scrapAppears.push("<a href='/collection/book/" + 
-										this.cp.myJSONList[index].book.number + "/'>" + 
+										this.cp.myJSONList[index].book.number + "'>" + 
 										this.cp.myJSONList[index].book.number + "(" + 
 										this.cp.myJSONList[index].book.stats.sources_ids_dict[ppskID] + ")</a>");
 								}

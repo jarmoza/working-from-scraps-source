@@ -1,23 +1,263 @@
 <template>
-    <div id="app">    
-        <wfs-page></wfs-page>
+    <div id="app">
+        <keep-alive>
+            <!-- <router-view :is="cp.childPageType" :cp="cp" :switchMethod="switchPageType"></router-view> -->
+            <router-view :cp="cp" :switchMethod="switchPageType"></router-view>
+        </keep-alive>
     </div>
 </template>
 
 <script>
 
-    import WfsPage from "./components/wfs_page.vue";
+// 'Working from Scraps' Vue components
+import WfsKeyword from "./components/wfs_keyword.vue";
+import WfsPagelevel from "./components/wfs_pagelevel.vue";
+import WfsPerson from "./components/wfs_person.vue";
+import WfsPlace from "./components/wfs_place.vue";
+import WfsSource from "./components/wfs_source.vue";
+import WfsScrapbooklevel from "./components/wfs_scrapbooklevel.vue";
 
-    export default {
+// 'Working from Scraps' data
+import scrapbook1JSON from "./assets/json/wfs_scrapbook_01.json";
+import scrapbook6JSON from "./assets/json/wfs_scrapbook_06.json";
+import scrapbook9JSON from "./assets/json/wfs_scrapbook_09.json";
+import scrapbook12JSON from "./assets/json/wfs_scrapbook_12.json";
+import collectionJSON from "./assets/json/wfs_collection_overview.json";
+import peopleJSON from "./assets/json/wfs_people.json";
+import placesJSON from "./assets/json/wfs_places.json";
+import sourcesJSON from "./assets/json/wfs_sources.json";
+import keywordsJSON from "./assets/json/wfs_keywords.json";    
 
-        name: "app",
 
-        components: {
+export default {
 
-            "wfs-page": WfsPage,
+    name: "app",
+
+    components: {
+
+        "wfs-keyword": WfsKeyword,
+        "wfs-scrapbooklevel": WfsScrapbooklevel,
+        "wfs-pagelevel": WfsPagelevel,
+        "wfs-person": WfsPerson,
+        "wfs-place": WfsPlace,
+        "wfs-source": WfsSource,
+    },  
+
+    data(){
+
+        return {
+            
+            // Current properties
+            cp: {
+
+                // Current page
+                bookNumber: scrapbook1JSON.book.number,
+                childPageType: "wfs-scrapbooklevel",
+                currentEntry: scrapbook1JSON.book,
+                currentPerson: null,
+                currentPlace: null,
+                currentSource: null,
+                currentKeyword: null,               
+                newPageListNeeded: false,
+                pageIndex: 0,
+                title: "Working from Scraps",           
+                
+                // JSON fields
+                myJSON: {
+
+                    "1": scrapbook1JSON,
+                    "6": scrapbook6JSON,
+                    "9": scrapbook9JSON,
+                    "12": scrapbook12JSON,
+                },
+                myJSONList: [scrapbook1JSON, scrapbook6JSON, scrapbook9JSON, scrapbook12JSON],
+                collection: collectionJSON,
+                peopleJSON: peopleJSON,
+                placesJSON: placesJSON,
+                sourcesJSON: sourcesJSON,
+                keywordsJSON: keywordsJSON,
+
+                // Book fields
+                bookIDsToNumbers: {
+                    "1": "1",
+                    "4": "6",
+                    "3": "9",
+                    "2": "12"
+                },
+
+                // Cover/spine colors used across pages
+                bookCoverColors: {
+
+                    "1": { spine: "#461E25", cover: "#1E202D" },
+                    "6": { spine: "#5E342A", cover: "#9B8778" },
+                    "9": { spine: "#2A0105", cover: "#1D3734" },
+                    "12": { spine: "#742F30", cover: "#14273A" }
+                },
+
+                // Icons
+                icons: {
+
+                    "people": "/src/assets/images/people_icon.png",
+                    "places": "/src/assets/images/places_icon.png",
+                    "sources": "/src/assets/images/sources_icon.png",
+                },
+
+                graphColors: [
+
+                    "#461E25", "#1E202D",
+                    "#5E342A", "#9B8778",
+                    "#2A0105", "#1D3734",
+                    "#742F30", "#14273A",
+                    "#232B2B", "#D9CCBB"
+                ],
+
+                // 'Colores' palette from colrd.com
+                colrdPalette: [
+                    "#1a1334", "#26294a",
+                    "#01545a", "#017351",
+                    "#03c383", "#aad962",
+                    "#fbbf45", "#ef6a32", 
+                    "#ed0345", "#a12a5e",    
+                    "#710162", "#110141",
+                ],
+            },
+        };
+    },
+
+    // Hooks
+    created() {
+
+        console.log("App creation");
+    },
+
+    // Methods
+    methods: {
+
+        switchPageType: function(p_pageType) {
+
+            console.log("switchPageType");
+
+            // General pattern for page switches:
+            // (1) Handle any necessary code pertaining to the current component/view
+            // (2) Call the general switchMethod prop (all map back to switchPageType in wfs_page.vue)
+
+            // Save the page type to swap child page components
+            this.cp.childPageType = p_pageType;
+
+            // Change shared current properties field for new active child page component
+            switch ( p_pageType ) {
+
+                case "wfs-pagelevel":
+                    
+                    this.cp.title = "Scrapbook " + this.cp.currentEntry.number; 
+                    this.setBackgroundColorToPageColor();
+
+                    break;
+
+                case "wfs-scrapbooklevel":
+    
+                    this.cp.title = "Working from Scraps";
+
+                    console.log("Scrapbook level change")
+
+                    if ( this.$route.params.bookNumber ) {
+
+                        console.log("Found book number")
+                        
+                        this.setNavbarToSpineColor();
+                        this.setBackgroundColorToCoverColor();
+
+                        this.$router.push({ 
+                            name: "book",
+                            params: { bookNumber: this.cp.currentEntry.number },
+                        });
+                    } else { 
+
+                        console.log("Setting to collection");
+
+                        this.setNavbarToCollectionColor();
+                        this.setBackgroundColorToPageColor();
+
+                        this.$router.push({ name: "home" });
+                    }
+
+                    break;
+
+                case "wfs-person":
+
+                    console.log("In person case");
+
+                    this.cp.title = this.cp.currentPerson.name;
+
+                    break;
+
+                case "wfs-place":
+
+                    this.cp.title = this.cp.currentPlace.name;
+
+                    break;
+
+                case "wfs-source":
+
+                    this.cp.title = this.cp.currentSource.name;
+
+                    break;
+
+                case "wfs-keyword":
+                
+                    this.cp.currentKeyword = 
+                        this.cp.collection.ids_to_keywords[this.$route.params.keywordID];
+                    this.cp.title = this.cp.currentKeyword;
+
+                    break;
+            }
         },
+
+        setBackgroundColorToCoverColor: function() {
+
+            $("body").css("background-color", this.cp.bookCoverColors[this.cp.bookNumber].cover);
+        },
+
+        setBackgroundColorToPageColor: function() {
+
+            $("body").css("background-color", "rgb(217, 204, 187)");
+        },
+
+        setNavbarToCollectionColor: function() {
+
+            // Workaround to override color via jQuery
+            let cp = this.cp;
+            $("#scrapbooklevel_navbar").each(function(){
+
+                this.style.setProperty("background-color", 
+                    "rgb(35, 43, 43)", "important");
+            });
+        },        
+
+        setNavbarToSpineColor: function() {
+
+            // Workaround to override color via jQuery
+            let cp = this.cp;
+            $(".scrapbooklevel_navbar").each(function(){
+
+                this.style.setProperty("background-color", 
+                    cp.bookCoverColors[cp.bookNumber].spine, "important");
+            });
+        },
+
+        // setPageLevelNavbarSpineColor(){
+
+        //     // Workaround to override color via jQuery
+        //     let cp = this.cp;
+        //     $(".pagelevel_navbar").each(function(){
+
+        //         this.style.setProperty("background-color", 
+        //             cp.bookCoverColors[cp.bookNumber].spine, "important");
+        //     });
+        // },
     }
-    </script>
+}
+</script>
 
 <style>
 
@@ -55,6 +295,7 @@ h5, h6 {
 button {
 
     outline: none !important;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
 /* App styles */
@@ -192,7 +433,7 @@ button {
 .wfs_sidebar_column {
 
     /*border-left: thick solid #000000;*/   
-    border-left: 3px solid #000000;
+    border-left: 3px solid rgba(0,0,0,0.5);
 }
 
 .wfs_pagelevel_nav_labels {

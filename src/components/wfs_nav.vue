@@ -70,10 +70,12 @@ export default {
 nav {
 
 	font-weight: normal;
+	box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
 navbar {
 	background-color: rgb(35, 43, 43) !important;
+
 }
 
 	

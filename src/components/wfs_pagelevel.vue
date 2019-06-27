@@ -130,7 +130,7 @@
 						<b-row>
 							<b-col cols="12" >
 							<div :style="{ height: viewportHeight, overflowY: 'scroll' }" class="wfs_shadowed_cards">
-								<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="currentOccurrences" occurrenceText="Occurrences on page" :cp="cp" :switchmethod="switchMethod" :previous-page="myComponentName" :roleList="myRoleList">
+								<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="currentOccurrences" occurrenceText="Occurrences on page" :cp="cp" :switchMethod="switchMethod" :previous-page="myComponentName" :roleList="myRoleList">
 								</component>
 								<span v-if="0 == myCardList.length && cardAddAttempt" style="font-size: 1em; top: 50%; left: 5%; position: relative;">No associated {{ plainTextCardType.toLowerCase() }}</span>
 							</div>
@@ -184,7 +184,7 @@ export default {
 
 	name: "wfs-pagelevel",
 
-	props: ["cp", "switchMethod"],
+	props: ["cp", "switchMethod", "previousMethod"],
 
 	components: {
 
@@ -252,7 +252,7 @@ export default {
 
 		viewportHeight: function() {
 
-			return "90vh";
+			return "100%";
 		},
 
 		plainTextCardType: function() {
@@ -390,11 +390,24 @@ export default {
 			}
 		},
 
+		pushNewPageRoute: function(p_bookNumber, p_pageNumber) {
+
+			this.$router.push({
+				name: "page", 
+				params: {
+					bookNumber: p_bookNumber, 
+					pageNumber: p_pageNumber
+				}
+			});
+		},
+
 		// Page navigation methods
 		firstPage: function() {
 
 			this.clearSideBar();
 			this.cp.pageIndex = 0;
+			this.pushNewPageRoute(this.$route.params.bookNumber,
+								  this.cp.pageIndex.toString());
 		},
 
 		// Page methods
@@ -404,6 +417,8 @@ export default {
 			if ( this.cp.pageIndex < this.cp.myJSON[this.cp.currentEntry.number].pages.length - 1 ){
 				this.cp.pageIndex += 1;
 			}
+			this.pushNewPageRoute(this.$route.params.bookNumber,
+								  this.cp.pageIndex.toString());
 		},
 
 		previousPage: function(){
@@ -412,12 +427,17 @@ export default {
 			if ( this.cp.pageIndex > 0 ) {
 				this.cp.pageIndex -= 1;
 			}
+			this.pushNewPageRoute(this.$route.params.bookNumber,
+								  this.cp.pageIndex.toString());
 		},
 
 		lastPage: function() {
 
 			this.clearSideBar();
 			this.cp.pageIndex = this.cp.myJSON[this.cp.currentEntry.number].pages.length - 1;
+			this.pushNewPageRoute(this.$route.params.bookNumber,
+								  this.cp.pageIndex.toString());
+		
 		},		
 
 		setNavbarToSpineColor: function() {
@@ -429,7 +449,8 @@ export default {
                 this.style.setProperty("background-color", 
                     cp.bookCoverColors[cp.bookNumber].spine, "important");
             });
-        },		
+        },
+
 
 		switchToScrapbookLevel: function() {
 
@@ -439,12 +460,14 @@ export default {
 			// Clear the page list dropdown
 			this.clearPageList();
 
-            // Push route
-            this.$router.push({ name: "Book", 
-                                params: { bookNumber: this.cp.currentEntry.number } });				
+            // // Push route
+            // this.$router.push({ name: "book", 
+            //                     params: { bookNumber: this.cp.currentEntry.number } });				
 
 			// Switch parent prop to scrapbooklevel component
-            this.switchMethod("wfs-scrapbooklevel");			
+            this.switchMethod("wfs-scrapbooklevel");
+
+            //this.switchToPreviousPage(); // Continue here		
 		},
 	},
 
@@ -465,14 +488,20 @@ export default {
 	},
 
 	mounted(){
-		
-		// this.setNavbarToSpineColor();
+
+		// Listen to browser back/forward button
+		window.onpopstate = function(p_event) {
+			this.cp.pageIndex = this.$route.params.pageNumber;
+		}.bind(this);
+
+		// Clear cards from previous page level view
+		this.clearSideBar();
 	},
 
 	updated() {
 
 		this.setNavbarToSpineColor();
-		
+
 		// Create a new list of pages for the navigation dropdown if needed
 		if ( this.cp.newPageListNeeded ) {
 			
@@ -480,6 +509,8 @@ export default {
 
 			// Reset the flag
 			this.cp.newPageListNeeded = false;
+
+			this.clearSideBar();
 		}
 	},
 }

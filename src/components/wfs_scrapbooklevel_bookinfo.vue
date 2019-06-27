@@ -5,12 +5,12 @@
         <!-- Scrapbook Information Header -->
         <b-row class="wfs_page_header">
             <b-col cols="6">
-                <h5 class="wfs_user_direction" style="float: left;">About this book</h5>
+                <h5 class="wfs_user_direction" style="float: left;">About this Book</h5>
             </b-col>
-            <b-col cols="6">
+            <!-- <b-col cols="6"> -->
                 <!-- Go to the page level view of this book -->
-                <b-button @click="switchToPageLevel" size="md" style="float: right;">View Pages</b-button>
-            </b-col>
+                <!-- <b-button @click="switchToPageLevel" size="md" style="float: right;">View Pages</b-button> -->
+            <!-- </b-col> -->
         </b-row>
 
         <!-- Scrapbook Information -->
@@ -28,19 +28,19 @@
 
                         <wfs-metadata label="Dimensions (cm)" :value="cp.currentEntry.width + 'w x ' +  cp.currentEntry.height + 'h x ' + cp.currentEntry.depth + 'd'"></wfs-metadata>
 
-                        <wfs-metadata label="Clippings" :value="cp.currentEntry.stats.clippings"></wfs-metadata>
+                        <wfs-metadata label="Total Clippings" :value="cp.currentEntry.stats.clippings"></wfs-metadata>
 
-                        <wfs-metadata label="Clippings w/ metadata" :value="cp.currentEntry.stats.clippings_w_metadata"></wfs-metadata>
+                        <wfs-metadata label="Clippings with date/source" :value="cp.currentEntry.stats.clippings_w_metadata"></wfs-metadata>
 
-                        <wfs-metadata label="Percent clippings described" :value="Number(100 * cp.currentEntry.stats.clippings_w_metadata / cp.currentEntry.stats.clippings).toFixed(2).toString() + '%'"></wfs-metadata>                        
+                        <wfs-metadata label="Percent clippings dated/sourced" :value="Number(100 * cp.currentEntry.stats.clippings_w_metadata / cp.currentEntry.stats.clippings).toFixed(2).toString() + '%'"></wfs-metadata>                        
 
                         <wfs-metadata label="Materiality" :value="' '">
                             <wfs-read-more more-str="read more" :text="cp.currentEntry.materiality_desc" link="#" less-str="read less" :max-chars="maxCharsReadMore"></wfs-read-more>
                         </wfs-metadata>
-
-                        <!-- <wfs-metadata label="Materiality" :value="cp.currentEntry.materiality_desc"></wfs-metadata> -->
                         
-                        <wfs-metadata label="Notes" :value="cp.currentEntry.notes"></wfs-metadata>                        
+                        <wfs-metadata label="Notes" :value="' '">
+                            <wfs-read-more more-str="read more" :text="cp.currentEntry.notes" link="#" less-str="read less" :max-chars="maxCharsReadMore"></wfs-read-more>
+                        </wfs-metadata>                        
 
                         <wfs-metadata label="Keywords" :value="' '">
                             <wfs-read-more more-str="read more" :text="keywordRouteStr" link="#" less-str="read less" :max-chars="maxCharsReadMore"></wfs-read-more>
@@ -127,11 +127,11 @@ export default {
             this.cp.newPageListNeeded = true;
 
             // Push route
-            this.$router.push({ name: "Page", // path: "/collection/", 
+            this.$router.push({ name: "page", // path: "/collection/", 
                                 params: { 
                                     bookNumber: this.cp.currentEntry.number, 
-                                    pageNumber: 0 } 
-                                } );
+                                    pageNumber: 0
+                                }});
             this.switchMethod("wfs-pagelevel");
         },
 	},

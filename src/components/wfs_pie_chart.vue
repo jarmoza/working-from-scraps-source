@@ -10,7 +10,7 @@
 
 		<b-row>
 			<b-col cols="12">
-				<pie-chart :data="myData" :legend="legend" :colors="myColors" :library="myOptions" :title="myLabel"></pie-chart>
+				<pie-chart :data="myData" :legend="legend" :colors="myColors" :library="myOptions" ></pie-chart>
 			</b-col>
 		</b-row>
 
@@ -23,7 +23,6 @@
 // Bootstrap grid
 import bRow from "bootstrap-vue/es/components/layout/row";
 import bCol from "bootstrap-vue/es/components/layout/col";
-
 
 export default {
 
@@ -41,26 +40,26 @@ export default {
 
 		return {
 
+			chart: null,
+
 			myOptions: {
 
+				backgroundColor: "#E8E8E8",
+				chartArea: { width: "150%", height: "150%" },
+				color: "grey",
 				fontName: "Raleway", 
-				color: "grey", 
 				fontSize: "1em",
+				legend: { position: "labeled" },
 				opacity: "1", 
-				backgroundColor: "#E8E8E8", 
-				chartArea: { width: "150%", height: "150%" }, 
-				legend: { position: "labeled"},
 				titleTextStyle: { 
 
+					bold: true,
 					color: "black",
   					fontName: "Raleway",
   					fontSize: 18,
-  					bold: true,
   					italic: false 
   				},		
 			},
-
-			chart: null,
 		};
 	},
 
@@ -68,47 +67,36 @@ export default {
 
 		this.myOptions.chartArea.width = ( this.pieScale ) ? this.pieScale : "150%";
 		this.myOptions.legend.position = this.legend;
-
-		//document.addEventListener('DOMContentLoaded',function(){
-  			
-  			/*Your chartist initialization code here*/
-
-			// Create a new Chartist pie chart
-			// new Chartist.Pie('.ct-chart', data, options, responsiveOptions);
-			//if ( null == this.chart ){
-				//this.chart = new Chartist.Pie("#" + this.chartID, this.myData);
-			//}
-		//});
 	}
+};
 
-}
 </script>
 
 <style>
 
-.chartjs-render-monitor {
+/* Deals with Google Charts tooltip flicker bug */
+svg > g > g:last-child { 
 
-	width: 75% !important;
-	height: 75% !important;
+	pointer-events: none;
+}
+
+.wfs_visualization_label {
+
+	color: black !important;
+	font-family: "Raleway";
+	font-size: 1.25em !important;
+	font-weight: 900;
+	
+	top: 100% !important;
+	bottom: 5% !important;
+	left: 0 !important;
+
+	z-index: 1000;
 }
 
 .wfs_visualization_pie_chart {
 
 	padding: 0em 1em 0em 1em;
-
 }
-
-.wfs_visualization_label {
-
-	font-size: 1em;
-	font-weight: 900;
-	color: grey;
-	left: 15%;
-	bottom: -250%;
-	position: relative;
-}
-
-/* Deals with Google Charts tooltip flicker bug */
-svg > g > g:last-child { pointer-events: none }
 
 </style>

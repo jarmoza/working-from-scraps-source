@@ -1,12 +1,9 @@
 <template>
 
 	<keep-alive>		
-
-		<component :is="childPageType" :switchMethod="switchPageType" :cp="cp" :previous-page="cp.previousPage">
-			
-		</component>
-
-	</keep-alive>
+        <component :is="cp.childPageType" :switchMethod="switchPageType" :previousMethod="switchToPreviousPage" :cp="cp" :previous-page="cp.previousPage">
+        </component>
+	</keep-alive> 
 
 </template>
 
@@ -49,28 +46,26 @@ export default {
 	data(){
 
 		return {
-
-			childPageType: "wfs-scrapbooklevel",
-
+			
 			// Current properties
 			cp: {
 
-				// Page history
-				// Contents have 'name' and 'options'
-				history: {}, 
-
 				// Current page
-				title: "Working from Scraps",
-				previousPage: "wfs-scrapbooklevel",
-				previousPages: ["wfs-scrapbooklevel"],
 				bookNumber: scrapbook1JSON.book.number,
-	            currentEntry: scrapbook1JSON.book,
-	            pageIndex: 0,
-	            newPageListNeeded: false,
+				childPageType: "wfs-scrapbooklevel",
+				currentEntry: scrapbook1JSON.book,
 	            currentPerson: null,
 	            currentPlace: null,
-	            currentSource: null,
+	            currentSource: null,				
+				newPageListNeeded: false,
+				pageIndex: 0,
+				previousPage: "wfs-scrapbooklevel",
+				title: "Working from Scraps",
 
+				// Page history
+				// Contents have 'name' and 'options'
+				history: {},			
+				
 	            // JSON fields
 	            myJSON: {
 
@@ -86,7 +81,13 @@ export default {
 	            sourcesJSON: sourcesJSON,
 	            keywordsJSON: keywordsJSON,
 
-	            bookIDsToNumbers: {},
+	            // Book fields
+	            bookIDsToNumbers: {
+	            	"1": "1",
+	            	"2": "6",
+	            	"3": "9",
+	            	"4": "12"
+	            },
 
 	            // Cover/spine colors used across pages
 				bookCoverColors: {
@@ -104,10 +105,6 @@ export default {
 					"places": "/src/assets/images/places_icon.png",
 					"sources": "/src/assets/images/sources_icon.png",
 				},
-
-				// Routing fields
-				pageHistoryRoutes: [],
-
 
 				graphColors: [
 
@@ -127,20 +124,24 @@ export default {
 					"#ed0345", "#a12a5e",    
 					"#710162", "#110141",
 				],
-			}
+			},
+
+
+			// Page history
 
 		};
 	},
 
 	methods: {
 
-		switchPageType: function(p_pageType){
+		switchPageType: function(p_pageType) {
+
+			// General pattern for page switches:
+			// (1) Handle any necessary code pertaining to the current component/view
+			// (2) Call the general switchMethod prop (all map back to switchPageType in wfs_page.vue)
 
 			// Save the page type to swap child page components
-			this.childPageType = p_pageType;
-
-			// Add the new page type to the previous pages list
-			// this.cp.previousPages.push(p_pageType);
+			this.cp.childPageType = p_pageType;
 
 			// Change shared current properties field for new active child page component
 			switch ( p_pageType ) {
@@ -162,7 +163,7 @@ export default {
 						this.setBackgroundColorToCoverColor();
 
 						this.$router.push({ 
-							name: "Book",
+							name: "book",
 							params: { bookNumber: this.cp.currentEntry.number },
 						});
 					} else { 
@@ -170,7 +171,7 @@ export default {
 						this.setNavbarToCollectionColor();
 						this.setBackgroundColorToPageColor();
 
-						this.$router.push({ name: "Collection" });
+						this.$router.push({ name: "home" });
 					}
 					break;
 
@@ -195,6 +196,50 @@ export default {
 
 					this.cp.title = this.cp.currentKeyword;
 					break;
+			}
+		},
+
+		switchToPreviousPage: function() {
+
+			// Pop previous page from stack
+			if ( this.previousPageParams.length > 0 ) {
+
+				// Get the previous page parameters
+				let previousParams = this.previousPageParams.pop();
+
+				// Save the page type to swap child page components
+				this.cp.childPageType = p_pageType;
+
+				switch ( previousParams.name ) {
+
+					case "Person":
+
+						break;
+
+					case "Place":
+
+						break;
+
+					case "Source":
+
+						break;
+
+					case "Keyword":
+
+						break;
+
+					case "Page":
+						
+						break;
+
+					case "Book":
+
+						break;
+
+					case "Collection":
+
+						break;
+				}
 			}
 		},
 
@@ -244,7 +289,3 @@ export default {
 }
 
 </script>
-
-<style>
-
-</style>

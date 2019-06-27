@@ -20,13 +20,13 @@
 
 						<b-row style="margin-bottom: 0.5em; margin-top: 1em; margin-left: 0em;">
 	
-					    	<b-col cols="3">
+					    	<!-- <b-col cols="3"> -->
 
 					    		<!-- Keywords search box here -->
-					    		<div style="margin-left: 1em; margin-top: 2em;">
+					    		<!-- <div style="margin-left: 1em; margin-top: 2em;">
 					    			<b-form-input class="wfs_search_box" size="lg" placeholder="Search Keywords...">		
 					    			</b-form-input>
-					    		</div>
+					    		</div> -->
 
 					    		<!-- <div style="margin-left: 1em; margin-top: 2em;">
 					    			<b-button class="wfs_search_box" variant="outline-secondary" size="lg">
@@ -38,18 +38,18 @@
 					    			</b-form-input>
 					    		</div> -->
 
-						    </b-col>
+						    <!-- </b-col> -->
 
 							<!-- Places, Sources icons -->
-							<b-col cols="5">
+							<b-col cols="6">
 
 				    			<b-row>
 				    				<b-col cols="12">
-				    					<span class="wfs_pagelevel_nav_labels" id="wfs_cooccurrences_label">Occurrences</span>
+				    					<span class="wfs_pagelevel_nav_labels" id="wfs_cooccurrences_label">Co-occurrences</span>
 				    				</b-col>
 				    			</b-row>								
 								
-								<b-row>
+								<b-row style="margin-top: 0.5em;">
 
 									<!-- People icon -->
 									<b-col cols="2" class="wfs_pps_icon_box">
@@ -84,23 +84,24 @@
 
 							</b-col>
 
-							<!-- Back to previous page button -->
+							<b-col cols="2"></b-col>
+
+							<!-- Back to collection button -->
 							<b-col cols="3" style="margin-left: 3em;">
-								<b-button @click="switchToPreviousPage" size="lg" style="float: right;" disabled>
-									<span>&nbsp;Back to previous page</span>
+								<b-button @click="backToCollection" size="lg" style="float: right;">
+									<span>&nbsp;Back to Collection</span>
 								</b-button>
 							</b-col>
 
 						</b-row>
 
 						<!-- Keyword information -->
-						<b-row style="margin-left: 1em !important;">
+						<!-- <b-row style="margin-left: 1em !important;">
 
 							<b-col cols="12">
 
 		                        <div class="wfs_page_component" style="margin: 2em 2em 0em 0em;">
 
-		                            <!-- Header -->
 		                            <b-row class="wfs_page_header" style="margin-left: 0.5em;">
 		                                <h5 class="wfs_user_direction">About this keyword</h5>
 		                            </b-row>
@@ -117,7 +118,7 @@
 
 							</b-col>
 
-						</b-row>
+						</b-row> -->
 
 						<!-- Featured in...description, visuals, and table -->
 						<b-row style="margin-left: 1em !important;">
@@ -143,8 +144,12 @@
 												<b-col cols="12">
 													<wfs-ppsk-featured 
 
-														v-for="bookID in Object.keys(cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].books)" :bookNumber="cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].books[bookID]" :pages="cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].pages"
-														:key="'ppskFeatured' + bookID" :cp="cp"></wfs-ppsk-featured>
+														v-for="bookID in Object.keys(cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].books)"
+														:bookNumber="cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].books[bookID]" 
+														:pages="cp.myJSON[cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].books[bookID]].book.stats.keyword_to_page_dict[cp.currentKeyword]"
+														:key="'ppskFeatured' + bookID"
+														:cp="cp"></wfs-ppsk-featured>
+														<!-- :pages="cp.keywordsJSON.ids[parseInt(cp.keywordsJSON.keywords[cp.currentKeyword])].pages" -->														
 												</b-col>
 											</b-row>		                         
 
@@ -163,7 +168,7 @@
 					<b-col class="wfs_sidebar_column" cols="3">
 						
 						<div :style="{ height: viewportHeight, overflowY: 'scroll' }" class="wfs_shadowed_cards">
-							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchmethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName"
+							<component v-for="entry in myCardList" :is="childCardType" :key="entry.id" :json="entry" :occurrences="coOccurrences" :cp="cp" :switchMethod="switchMethod" occurrenceText="Co-occurrence on pages" :previous-page="myComponentName"
 							:roleList="myRoleList">
 								
 							</component>
@@ -209,13 +214,13 @@ export default {
 
 	name: "wfs-keyword",
 
-	props: ["cp", "previousPage", "switchMethod"],
+	props: ["cp", "switchMethod"],
 
 	computed: {
 
 		viewportHeight: function() {
 
-			return "90vh";
+			return "100%";
 		}
 	},
 
@@ -240,6 +245,13 @@ export default {
 		"icon": Icon,
 	},
 
+	created() {
+
+		if ( !this.cp.currentKeyword ) {
+			this.cp.currentKeyword = this.cp.collection.ids_to_keywords[this.$route.params.keywordID];
+		}
+	},
+
 	data() {
 		
 		return {
@@ -262,6 +274,11 @@ export default {
 			this.myCardList.push(p_json);
 		},
 
+        backToCollection: function() {
+
+            this.switchMethod("wfs-scrapbooklevel");
+        },			
+
 		clearSideBar: function() {
 
 			// Clear the array, will automatically depopulate the list of card components
@@ -273,7 +290,7 @@ export default {
 
 			let myPPSIDs = null;
 			let myCoOccurrences = {};
-			let myPerson = this.cp.currentPerson;
+			let myKeyword = this.cp.keywordsJSON.ids[this.$route.params.keywordID];
 
 			// Change active card type
 			this.childCardType = p_type;
@@ -281,20 +298,20 @@ export default {
 			// Clear the side bar of cards
 			this.clearSideBar();
 
-			// Get a ref. to the corresponding place/source collection of co-occurring IDs for this person
+			// Get a ref. to the corresponding place/source collection of co-occurring IDs for this keyword
 			switch ( p_type ){
 
 				case "wfs-person-card":
-					myPPSIDs = myPerson.stats.people_ids;
-					myCoOccurrences = myPerson.stats.people_on_pages_dict;
+					myPPSIDs = myKeyword.stats.people_ids;
+					myCoOccurrences = myKeyword.stats.people_on_pages_dict;
 					break;
 				case "wfs-place-card":
-					myPPSIDs = myPerson.stats.places_ids;
-					myCoOccurrences = myPerson.stats.places_on_pages_dict;
+					myPPSIDs = myKeyword.stats.places_ids;
+					myCoOccurrences = myKeyword.stats.places_on_pages_dict;
 					break;
 				case "wfs-source-card":
-					myPPSIDs = myPerson.stats.sources_ids;
-					myCoOccurrences = myPerson.stats.sources_on_pages_dict;
+					myPPSIDs = myKeyword.stats.sources_ids;
+					myCoOccurrences = myKeyword.stats.sources_on_pages_dict;
 					break;
 			}
 
@@ -368,11 +385,12 @@ export default {
 
 		switchToPreviousPage: function() {
 
+			console.log("switchToPreviousPage keyword")
+
 			// Clear the sidebar of cards
 			this.clearSideBar();
 
 			// Switch back to the page that brought the user to this keyword page
-			// this.switchMethod(this.previousPage);
 			this.$router.go(-1);
 
 	        // Routing goes through Scrapbooklevel create (NOTE: probably because it's at the top level of the App - should look into why)

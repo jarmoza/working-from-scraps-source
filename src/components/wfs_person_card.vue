@@ -50,22 +50,77 @@
 								<wfs-metadata label="d." :value="json.death"></wfs-metadata>
 								<wfs-metadata label="Gender" :value="json.gender"></wfs-metadata>
 								<wfs-metadata label="Nationality" :value="json.nationality"></wfs-metadata>
-								<wfs-metadata label="More information" :value="json.link" is-link></wfs-metadata>
+								<wfs-metadata label="Epithet(s)" :value="json.epithets"></wfs-metadata>
+								<wfs-metadata label="Alternative Name(s)" :value="json.addl_names"></wfs-metadata>
+
+								<!-- Implementation 1 -->
+								<!-- <wfs-metadata label="More information" :value="json.link" is-link></wfs-metadata>
 								<wfs-metadata label="In the Scrapbooks" value=" " style="float: left;"></wfs-metadata>
 								<span>&nbsp;&nbsp;</span>
 								
-								<span class="wfs_inthescrapbooks_icon">									
-									<img :src="openBookIcon" @click="switchToPersonPage" title="Find this person in the scrapbooks" height="20"/>
-								</span>
-								<!-- <span class="wfs_inthescrapbooks_icon">									
-									<img :src="openBookIcon" @click="showMyModal" title="Find this person in the scrapbooks" height="20"/>
+								<span class="wfs_inthescrapbooks_icon">				<img :src="openBookIcon" @click="switchToPersonPage" title="Find this person in the scrapbooks" height="20"/>
+								</span> -->
 
-								</span>
-								<b-modal size="lg" ref="myModalRef" ok-only centered>
-									<span slot="modal-header">{{ name }}</span>
-									<span slot="modal-ok">Close</span>									
-									<wfs-person-modal-contents :cp="cp" :json="json" ></wfs-person-modal-contents>
-								</b-modal> -->
+								<!-- Implementation 2 -->
+								<!-- <a :href="json.link" target="_blank">
+									<b-button class="wfs_button wfs_card_button">
+										More information &nbsp;
+										<span class="wfs_inthescrapbooks_icon">
+											<img :src="linkIcon" height="22"/>
+										</span>
+									</b-button>
+								</a>
+
+								<b-button class="wfs_button wfs_card_button">
+									In the Scrapbooks &nbsp;
+									<span class="wfs_inthescrapbooks_icon">
+										<img :src="openBookIcon" @click="switchToPersonPage" title="Find this person in the scrapbooks" height="20"/>
+									</span>
+								</b-button> -->	
+
+								<!-- Implementation 3 -->
+								<!-- <b-row>
+									<b-col cols="2" style="padding: 0.5em 0 0 0.75em;">
+										<img :src="openBookIcon" title="Find this person in the scrapbooks" height="20" />
+									</b-col>
+									<b-col cols="10">
+										<b-button class="wfs_button wfs_card_button" @click="switchToPersonPage">In the Scrapbooks</b-button>
+									</b-col>
+								</b-row>								
+								<b-row>
+									<b-col cols="2" style="padding: 0.5em 0 0 1.75em;">
+										<img :src="linkIcon" title="More information on this person" height="28" />
+									</b-col>
+									<b-col cols="10">
+										<a :href="json.link" target="_blank">
+											<b-button class="wfs_button wfs_card_button">More Information</b-button>
+										</a>
+									</b-col>
+								</b-row> -->
+
+
+								<!-- Implementation 4 -->
+								<b-row style="margin-top: 1em;">
+									<b-col cols="12">
+										<wfs-metadata-button value="In the Scrapbooks" 
+										:click="switchToPersonPage">
+											<img :src="openBookIcon" title="Find this place in the scrapbooks" height="30"
+												 style="padding-top: 0.35em; vertical-align: sub;"/>
+										</wfs-metadata-button>
+									</b-col>
+								</b-row>
+								<b-row>
+									<div style="padding: 0 1em 0 1em">
+										<wfs-metadata-button value="VIAF" :href="json.viaf" is-link>
+											<img :src="globeIcon" title="Virtual International Authority File" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+										</wfs-metadata-button>
+									</div>
+									<div style="padding: 0 1em 0 1em">
+										<wfs-metadata-button value="On the Internet" :href="json.link" isLink>
+											<img :src="linkIcon" title="More information on this person" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+										</wfs-metadata-button>
+									</div>
+								</b-row>
 
 							</div>
 						</b-collapse>
@@ -96,6 +151,7 @@ import bCollapse from "bootstrap-vue/es/components/collapse/collapse";
 
 // WFS components
 import wfsMetadata from "./wfs_metadata.vue";
+import wfsMetadataButton from "./wfs_metadata_button.vue";
 
 // Third party VueJS components
 import Icon from "vue-awesome/components/Icon";
@@ -107,7 +163,7 @@ export default {
 
 	name: "wfs-person-card",
 
-	props: ["cp", "json", "occurrences", "switchmethod", "occurrenceText", "previousPage", "roleList"],
+	props: ["cp", "json", "occurrences", "switchMethod", "occurrenceText", "roleList"],
 
 	components: {
 
@@ -121,6 +177,7 @@ export default {
         "b-col": bCol,		
 
 		"wfs-metadata": wfsMetadata,
+		"wfs-metadata-button": wfsMetadataButton,
 		
 		"icon": Icon,
 	},
@@ -179,11 +236,13 @@ export default {
 		return {
 
 			showCollapse: true,
-			openBookIcon: "/src/assets/images/open_book_icon.png",
+			globeIcon: "/src/assets/images/globe_icon_white.png",
+			linkIcon: "/src/assets/images/link_icon_white.png",
+			openBookIcon: "/src/assets/images/open_book_icon_white.png",
 		};
 	},
 
-	methods: {
+	methods: {		
 
 		hideMyModal: function() {
 
@@ -197,17 +256,20 @@ export default {
 
 		switchToPersonPage: function() {
 
+			console.log("switchToPersonPage");
+
+			console.log("this.json: ");
+			console.log(this.json);
+
 			// Save person JSON for reference
 			this.cp.currentPerson = this.json;
 
-			// Save previous page type to page level
-			this.cp.previousPage = this.previousPage;
-
             // Push route
-            this.$router.push({ name: "Person", 
-                                params: { personID: this.cp.currentPerson.id } });			
+            this.$router.push({ name: "person", 
+                                params: { personID: this.cp.currentPerson.id } });
+                                			
 			// Switch to the person page
-			this.switchmethod("wfs-person");
+			this.switchMethod("wfs-person");
 		},
 	}
 }
@@ -215,6 +277,12 @@ export default {
 </script>
 
 <style>
+
+.wfs_card_button {
+
+	margin: 0.25em 0.25em 0.125em 0.125em;
+	padding: 0.25em 0.45em 0.25em 0.45em;
+}
 
 .wfs_card_custom {
 	background-color: rgba(0,0,0,0);

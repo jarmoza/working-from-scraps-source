@@ -1,122 +1,148 @@
 <template>
 
+<div>
+
+    <!-- Navbar -->
+    <wfs-nav :title="cp.title" :color="spineColor" id="scrapbooklevel_navbar">
+        <span class="navbar-brand-righttext">{{ currentlyExamined }}</span>
+    </wfs-nav>                  
+
     <div>
 
-        <!-- Navbar -->
-        <wfs-nav :title="cp.title" :color="spineColor" id="scrapbooklevel_navbar">
-            <span class="navbar-brand-righttext">{{ currentlyExamined }}</span>
-        </wfs-nav>                  
+        <b-container class="wfs_main_content_area" fluid>
 
-        <div>
+            <b-row style="margin: 2em 1em 2em 2em;">
 
-            <b-container class="wfs_main_content_area" fluid>
+                <!-- Scrapbook List -->
+                <b-col cols="6">
 
-                <b-row style="margin: 2em 1em 2em 2em;">
+                    <b-row>
+                        <b-col cols="12">
 
-                    <!-- Scrapbook List -->
-                    <b-col cols="6">
+                            <div class="wfs_page_component">
 
-                        <b-row>
-                            <b-col cols="12">
+                                <!-- Header -->
+                                <b-row class="wfs_page_header">
+                                    <b-col cols="6">
+                                        <h5 class="wfs_user_direction" style="float: left;">Select a book</h5>
+                                    </b-col>
+                                    <!-- <b-col cols="6">
+                                        <b-button  @click="backToCollection" style="float: right; margin: 0;" v-if="'Collection' != currentlyExaminedEntry">Back to Collection</b-button>
 
-                                <div class="wfs_page_component">
+                                    </b-col> -->
+                                </b-row>
 
-                                    <!-- Header -->
-                                    <b-row class="wfs_page_header">
-                                        <b-col cols="6">
-                                            <h5 class="wfs_user_direction" style="float: left;">Select a book</h5>
-                                        </b-col>
-                                        <b-col cols="6">
-                                            <b-button class="wfs_button" @click="backToCollection" style="float: right; margin: 0;" v-if="'Collection' != currentlyExaminedEntry">Back to Collection</b-button>
+                                <!-- List -->
+                                <b-row class="wfs_page_content" style="margin-bottom: 1em;">
 
-                                        </b-col>
-                                    </b-row>
+                                    <b-col cols="12">
+                                        
+                                        <b-row style="margin-top: 0em;">
 
-                                    <!-- List -->
-                                    <b-row class="wfs_page_content">
-
-                                        <b-col cols="12">
                                             
-                                            <b-row style="margin-top: 0em;">
+                                            <b-col cols="3" v-for="entry in cp.myJSONList" :key="entry['book']['id']" @click="selectScrapbook(entry['book']['number'])">
+                                                
+                                                <div class="wfs_scrapbook_icon_container">
 
-                                                <b-col cols="3" v-for="entry in cp.myJSONList" :key="entry['book']['id']" @click="selectScrapbook(entry['book']['number'])" >
-                                                    
-                                                    <div class="wfs_scrapbook_icon_container">
+                                                    <b-img 
+                                                        :src="bookImages[entry['book']['number']]" blank-color="#abc" 
+                                                        :style="{width: selectedScale(entry['book']['number'], bookImgScales[entry['book']['number']]), height: selectedScale(entry['book']['number'], bookImgScales[entry['book']['number']]), borderStyle: 'solid', borderRadius: bookIconBorderRadius(entry['book']['number']), borderColor: 'rgb(159,45,94)', borderWidth: bookIconBorderWidth(entry['book']['number']), backgroundColor: bookIconBackground(entry['book']['number'])}" 
+                                                        alt="placeholder" 
+                                                        class="wfs_scrapbook_icon_img"
+                                                        fluid/>
 
-                                                        <b-img :src="bookImages[entry['book']['number']]" blank-color="#abc" :style="{width: bookImgScales[entry['book']['number']], height: bookImgScales[entry['book']['number']] }" alt="placeholder" class="wfs_scrapbook_icon_img" fluid/>
+                                                    <div class="wfs_scrapbook_icon_number">{{ entry['book']['number'] }}</div>
+                                                </div>
 
-                                                        <div class="wfs_scrapbook_icon_number">{{ entry['book']['number'] }}</div>
-                                                    </div>
+                                                <br/>
+                                            </b-col>
+                                        </b-row>
 
-                                                    <br/>
-                                                </b-col>
+                                        <b-row><b-col cols="12"><br/></b-col></b-row>
 
-                                            </b-row>
+                                        <!-- View scrapbook pages button -->
+                                        
+                                        <b-row v-if="'Collection' != currentlyExaminedEntry">
 
-                                            <!-- Back to the collection button -->
-                                            <b-row>
-                                                <b-col cols="12">
-                                                </b-col>
-                                            </b-row>
+                                            <b-col cols="4">
+                                                <wfs-metadata-button value="Back to Collection" :click="backToCollection">
+                                                    <img :src="backArrow" title="Return to collection view" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+                                                </wfs-metadata-button>
+                                                <!-- <b-button  @click="backToCollection" style="float: right; margin: 0;" v-if="'Collection' != currentlyExaminedEntry">Back to Collection</b-button> -->
+                                            </b-col>
+                                            <b-col cols="2"></b-col>
+                                            <b-col cols="6">
+                                                <wfs-metadata-button value="Inside this Book" :click="switchToPageLevel" style="float: right;">
+                                                    <img :src="openBookIcon" title="Look inside this scrapbook" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+                                                </wfs-metadata-button>
+                                            </b-col>
+                                            <!-- <b-col cols="2">
+                                                <img :src="openBookIcon" title="Look inside this scrapbook" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+                                            </b-col>
+                                            <b-col cols="10" style="padding-left: 0;">
+                                                <b-button  @click="switchToPageLevel" style="float: left;">Inside this Scrapbook</b-button>
+                                            </b-col> -->
+                                        </b-row>
 
-                                        </b-col>
+                                    </b-col>
 
-                                    </b-row>
-                                </div>
-                            </b-col>
-                        </b-row>
+                                </b-row>
+                            </div>
+                        </b-col>
+                    </b-row>
 
-                    </b-col>
+                </b-col>
 
-                    <b-col class="wfs_page_component" cols="5" style="margin-left: 4.25em;">
+                <!-- Collection or Book info -->
+                <b-col class="wfs_page_component" cols="5" style="margin-left: 4.25em;">
 
-                        <!-- Collection Overview or Scrapbook information -->
-                        <!-- Click contextual info - either Collection Overview or Scrapbook -->
-                        <keep-alive>
-                            <component :is="childInfoType" :cp="cp" :switchMethod="switchMethod"></component>
-                        </keep-alive>
+                    <!-- Collection Overview or Scrapbook information -->
+                    <!-- Click contextual info - either Collection Overview or Scrapbook -->
+                    <keep-alive>
+                        <router-view :is="childInfoType" :cp="cp" :switchMethod="switchMethod"></router-view>
+                    </keep-alive>
 
-                    </b-col>
+                </b-col>
 
-                </b-row>
+            </b-row>
 
-                <!-- Visualization area -->
-                <b-row style="margin: 2em 2em 2em 2em;" id="wfs_collection_book_visualization_area">
+            <!-- Visualization area -->
+            <b-row style="margin: 2em 2em 2em 2em;" id="wfs_collection_book_visualization_area">
 
-                    <b-col cols="12">
-                        <keep-alive>
-                            <component :is="childVisType" :cp="cp"></component>
-                        </keep-alive>
-                    </b-col>
-                 
-                </b-row>
+                <b-col cols="12">
+                    <keep-alive>
+                        <router-view :is="childVisType" :cp="cp"></router-view>
+                    </keep-alive>
+                </b-col>
+             
+            </b-row>
 
-            </b-container>
-        </div>
-
-        <!-- <div id="wfs_booklevel_footer">
-
-            <b-container style="padding: 0;" fluid>
-
-                <b-row>
-                    <b-col cols="2" style="padding: 0;" id="wfs_triangle_left">
-                    </b-col>
-                    <b-col cols="8"></b-col>
-                    <b-col cols="2" style="padding: 0;" id="wfs_triangle_right">
-                    </b-col>
-                </b-row>
-
-                <b-row class="wfs_footer">
-                    <b-col cols="11" style="background-color: black;"></b-col>
-                    <b-col cols="1">
-                        <a class="wfs_footer_text" href="about.html">About</a>
-                    </b-col>
-                </b-row>
-
-            </b-container>
-        </div> -->
-
+        </b-container>
     </div>
+
+    <!-- <div id="wfs_booklevel_footer">
+
+        <b-container style="padding: 0;" fluid>
+
+            <b-row>
+                <b-col cols="2" style="padding: 0;" id="wfs_triangle_left">
+                </b-col>
+                <b-col cols="8"></b-col>
+                <b-col cols="2" style="padding: 0;" id="wfs_triangle_right">
+                </b-col>
+            </b-row>
+
+            <b-row class="wfs_footer">
+                <b-col cols="11" style="background-color: black;"></b-col>
+                <b-col cols="1">
+                    <a class="wfs_footer_text" href="about.html">About</a>
+                </b-col>
+            </b-row>
+
+        </b-container>
+    </div> -->
+
+</div>
 
 </template>
 
@@ -133,6 +159,7 @@ import bCol from "bootstrap-vue/es/components/layout/col";
 
 // WFS components
 import wfsMetadata from "./wfs_metadata.vue";
+import wfsMetadataButton from "./wfs_metadata_button.vue";
 import wfsNav from "./wfs_nav.vue";
 import wfsScrapbookLevelBookInfo from "./wfs_scrapbooklevel_bookinfo.vue";
 import wfsScrapbookLevelCollectionInfo from "./wfs_scrapbooklevel_collectioninfo.vue";
@@ -164,12 +191,45 @@ export default {
         "b-col": bCol,
 
         "wfs-metadata": wfsMetadata,
+        "wfs-metadata-button": wfsMetadataButton,
         "wfs-nav": wfsNav,
         "wfs-scrapbooklevel-bookinfo": wfsScrapbookLevelBookInfo,
         "wfs-scrapbooklevel-collectioninfo": wfsScrapbookLevelCollectionInfo,
         "wfs-scrapbooklevel-bookvis": wfsScrapbookLevelBookVis,
         "wfs-scrapbooklevel-collvis": wfsScrapbookLevelCollVis,
     },
+
+    // beforeRouteUpdate(to, from, next){ 
+        
+    //     console.log("beforeRouteEnter");
+
+    //     // this.pickCollectionOrBook(to.path, to.params);
+
+    //     next(); 
+
+    // },
+    // beforeRouteLeave(to, from, next){ console.log("beforeRouteLeave"); next(); },
+
+    beforeRouteEnter(to, from, next){
+
+        console.log("beforeRouteUpdate");
+
+        next(vm => {
+
+            if ( vm.$route.path.params &&
+                 vm.$route.path.params.includes("/collection/book/")) { 
+                vm.currentlyExaminedEntry = "Scrapbook " + vm.$route.params.bookNumber;
+                vm.setNavbarToSpineColor();
+                vm.setBackgroundColorToCoverColor();
+
+            } else {
+                vm.currentlyExaminedEntry = "Collection";
+                vm.setNavbarToCollectionColor();
+                vm.setBackgroundColorToPageColor();
+            }
+            // vm.pickCollectionOrBook(vm.$route.path, vm.$route.params);
+        });
+    },    
 
     data () {
 
@@ -194,7 +254,10 @@ export default {
                 "6": "90%",
                 "9": "100%",
                 "12": "100%",
-            }, 
+            },
+
+            backArrow: "/src/assets/images/back_arrow_flip_white.png",
+            openBookIcon: "/src/assets/images/open_book_icon_white.png",
         }; 
     },
 
@@ -208,12 +271,42 @@ export default {
         spineColor: function() {
 
             return ( "Collection" == this.currentlyExaminedEntry ) ? "rgb(35, 43, 43)" :  this.cp.bookCoverColors[this.cp.bookNumber].spine
+        },
+
+        viewPagesOfText: function() {
+
+            return ( "Collection" == this.currentlyExaminedEntry ) ? "" : "View pages of " + this.currentlyExaminedEntry;
         }
     },
 
-    methods: {
+    methods: { 
+
+        pickCollectionOrBook: function(p_path, p_params) {
+
+            // Collection route
+            if ( "/" === p_path || 
+                 "/collection" === p_path ) {
+                console.log("beforeRouteLeave");
+                this.backToCollection();
+            // Else, this is a book route
+            } else {
+
+                this.currentlyExaminedEntry = "Scrapbook " + p_params.bookNumber;
+
+                this.selectScrapbook(p_params.bookNumber);
+
+                // Start navbar color with the spine color from scrapbook 1
+                this.setNavbarToSpineColor();
+
+                // Set background color with the cover color from scrapbook 1
+                console.log("setBackgroundColorToCoverColor in pickCollectionOrBook");
+                this.setBackgroundColorToCoverColor();
+            }
+        },
 
         backToCollection: function() {
+
+            console.log("backToCollection call");
 
             // Change info component to collection level
             this.childInfoType = "wfs-scrapbooklevel-collectioninfo";
@@ -236,11 +329,26 @@ export default {
             this.setBackgroundColorToPaperColor();
 
             // Push collection route
-            this.$router.push({
-                name: "Collection"
-            });
-
+            this.$router.push({ name: "home" });
         },
+
+        bookIconBackground: function(p_bookNumber) {
+
+            return ( "Collection" != this.currentlyExaminedEntry && 
+                     p_bookNumber.toString() == this.cp.bookNumber ) ? "rgb(159,45,94)" : "none";
+        },
+
+        bookIconBorderRadius: function(p_bookNumber) {
+
+            return ( "Collection" != this.currentlyExaminedEntry &&
+                     p_bookNumber.toString() == this.cp.bookNumber ) ? "5px" : "0px";
+        },
+
+        bookIconBorderWidth: function(p_bookNumber) {
+
+            return ( "Collection" != this.currentlyExaminedEntry &&
+                     p_bookNumber.toString() == this.cp.bookNumber ) ? "thick" : "0px";
+        },             
 
         createWordCloud: function(p_contentAreaID, p_cloudDivID) {
 
@@ -308,13 +416,28 @@ export default {
               //     //window.location = "https://www.google.co.uk/search?q=" + d.text;
               // })
               .start();  
+        },      
+
+        selectedScale(p_bookNumber, p_dimension) {
+
+            let scale = p_dimension;
+
+            if ( "Collection" != this.currentlyExaminedEntry && 
+                 p_bookNumber.toString() == this.cp.bookNumber ) {
+             
+                scale = (parseInt(p_dimension) * 1.25).toString() + "%";
+            }
+
+            return scale;
         },
 
         selectScrapbook: function(p_clickedBookNumber) {
 
+            console.log("selectScrapbook");
+
             for ( var bookNumber in this.cp.myJSON ){
 
-                if ( p_clickedBookNumber == bookNumber ){
+                if ( p_clickedBookNumber == bookNumber ) {
 
                     // Change info component to scrapbook level
                     this.childInfoType = "wfs-scrapbooklevel-bookinfo";
@@ -333,13 +456,14 @@ export default {
                     this.setNavbarToSpineColor();
 
                     // Alter the cover color
+                    console.log("setBackgroundColorToCoverColor in selectScrapbook");
                     this.setBackgroundColorToCoverColor();
 
                     // Push the scrapbook route
                     this.$router.push({
-                        name: "Book",
+                        name: "book",
                         params: { bookNumber: this.cp.currentEntry.number },
-                    });
+                    });     
 
                     break;
                 }
@@ -358,6 +482,7 @@ export default {
 
         setBackgroundColorToCoverColor: function() {
 
+            // console.log("setBackgroundColorToCoverColor with " + this.cp.bookCoverColors[this.cp.bookNumber].cover);
             $("body").css("background-color", this.cp.bookCoverColors[this.cp.bookNumber].cover);
         },
 
@@ -370,6 +495,8 @@ export default {
                 this.style.setProperty("background-color", 
                     "rgb(35, 43, 43)", "important");
             });
+
+            this.currentlyExaminedEntry = "Collection";
         },
 
         setNavbarToSpineColor: function() {
@@ -383,10 +510,25 @@ export default {
             });
         },
 
+        // switchToPageLevel: function() {
+
+        //     this.switchMethod("wfs-pagelevel");
+        // },
+
         switchToPageLevel: function() {
 
+            // Indicate a new page list is needed for the pagelevel page
+            this.cp.newPageListNeeded = true;
+
+            // Push route
+            this.$router.push({ name: "page",
+                                params: { 
+                                    bookNumber: this.cp.currentEntry.number, 
+                                    pageNumber: 0
+                                }});
+
             this.switchMethod("wfs-pagelevel");
-        }
+        },        
 
         // createChart: function() {
 
@@ -408,6 +550,8 @@ export default {
 
     // Hooks
     created() {
+
+        console.log("Scrapbooklevel creation");
 
         // Create book ID to book number dictionary
         for ( let index = 0; index < this.cp.myJSONList.length; index++ ) {
@@ -433,7 +577,7 @@ export default {
                 this.switchMethod("wfs-place");
             } 
             // Source routing
-            else if ( this.$route.params.sourceID) {
+            else if ( this.$route.params.sourceID ) {
 
                 this.cp.currentSource = 
                     this.cp.sourcesJSON[this.$route.params.sourceID];
@@ -466,7 +610,8 @@ export default {
                     this.setNavbarToSpineColor();
 
                     // Set background color with the cover color from scrapbook 1
-                    this.setBackgroundColorToCoverColor();  
+                    console.log("setBackgroundColorToCoverColor in created");
+                    this.setBackgroundColorToCoverColor(); 
                 } else { 
 
                     // Switch currently examined field to collection
@@ -480,7 +625,7 @@ export default {
                 }
 
                 this.switchMethod("wfs-scrapbooklevel");
-            } 
+            }
         }    
     },
 
@@ -491,6 +636,35 @@ export default {
         // Create word cloud within visualization content area on the given div
         // this.createWordCloud("#wfs_collection_book_visualization_area",
         //                      "#wfs_collection_book_cloud");
+
+        // Listen to browser back/forward button
+        window.onpopstate = function(p_event) {
+            this.selectScrapbook(this.$route.params.bookNumber);
+        }.bind(this);
+    },
+
+    updated() {
+
+        // if ( this.$route.params ){
+        //     console.log(this.$route.params);
+        //     console.log(this.cp.bookNumber);
+        // }
+
+        // if ( this.$route.path.includes("/collection/book") ) {
+        //      if ( this.cp.bookNumber != this.$route.params.bookNumber ) {
+        //         selectScrapbook(this.$route.params.bookNumber);
+        //     }
+        // } else if ( this.currentlyExaminedEntry.includes("Scrapbook") ){
+        //     this.backToCollection();
+        // }
+
+    //     if ( "Collection" == this.currentlyExaminedEntry &&
+    //          this.$route.path.includes("/collection/book") ) {
+    //         this.pickCollectionOrBook(this.$route.path, this.$route.params);
+    //     } else if ( this.currentlyExaminedEntry.includes("Scrapbook") &&
+    //                 this.$route.path == "/collection" ) {
+    //         this.pickCollectionOrBook(this.$route.path, this.$route.params);
+    //     } 
     }
 }
 
@@ -604,4 +778,41 @@ export default {
     letter-spacing: 1px;
     font-size: 1.6em;
 }
+
+
+/* Create a simple white box, and add the shadow for the initial state */
+.wfs_inthescrapbooks_icon {
+
+    position: relative;
+    display: inline-block;
+    /*background-color: #E8E8E8;*/
+    /*box-shadow: 0 1px 2px rgba(0,0,0,0.15);*/
+    transition: all 0.3s ease-in-out;
+}
+
+/* Create the hidden pseudo-element */
+/* include the shadow for the end state */
+.wfs_inthescrapbooks_icon::after {
+
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    /*box-shadow: 0 5px 15px rgba(0,0,0,0.3);*/
+    transition: opacity 0.3s ease-in-out;
+}
+
+.wfs_inthescrapbooks_icon:hover {
+
+    -webkit-transform: scale(1.25, 1.25);
+    transform: scale(1.25, 1.25);
+}
+
+.wfs_inthescrapbooks_icon:hover::after {
+
+    opacity: 1;
+}
+
 </style>

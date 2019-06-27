@@ -33,17 +33,45 @@
 
 						<b-collapse :id="'collapse' + json.id" v-model="showCollapse" visible>
 							<div style="padding: 1em;">
-								<wfs-metadata :label="occurrenceText" :value="occurrences[json.id]"></wfs-metadata>
+
+								<wfs-metadata label="Country" :value="json.countries"></wfs-metadata>
+								<wfs-metadata label="Continent" :value="json.continent"></wfs-metadata>
 								<wfs-metadata label="Additional names" :value="json.addl_names"></wfs-metadata>
-								<wfs-metadata label="In the Scrapbooks" value=" " style="float: left;"></wfs-metadata>
+								<!-- NOTE: As of 2019 WOEID is discontinued. Field remains in the places json for history J. Armoza 06/18/2019 -->
+								<!-- <wfs-metadata label="Where-on-Earth ID" :value="json.woeid"></wfs-metadata> -->
+								<wfs-metadata label="Latitude" :value="json.lat"></wfs-metadata>
+								<wfs-metadata label="Longitude" :value="json.long"></wfs-metadata>
+								<wfs-metadata label="Geoname" :value="json.geolink" isLink></wfs-metadata>
+								<wfs-metadata :label="occurrenceText" :value="occurrences[json.id]"></wfs-metadata>
+								
+
+								<!-- Implementation 1 -->
+								<!-- <wfs-metadata label="In the Scrapbooks" value=" " style="float: left;"></wfs-metadata>
 								<span>&nbsp;&nbsp;</span>
 								<span class="wfs_inthescrapbooks_icon">									
 									<img :src="openBookIcon" @click="switchToPlacePage" title="Find this place in the scrapbooks" height="20"/>
 
-								</span>
-								<!-- <b-modal centered ref="myModalRef">
-									<span>This is my data</span>
-								</b-modal> -->		
+								</span> -->
+
+								<!-- Implementation 2 -->
+								<!-- <b-row>
+									<b-col cols="2" style="padding: 0.5em 0 0 0.75em;">
+										<img :src="openBookIcon" title="Find this person in the scrapbooks" height="20" />
+									</b-col>
+									<b-col cols="10">
+										<b-button class="wfs_button wfs_card_button" @click="switchToPlacePage">In the Scrapbooks</b-button>
+									</b-col>
+								</b-row> -->
+
+								<!-- Implementation 3 -->
+								<b-row style="margin-top: 1em;">
+									<b-col cols="12">
+										<wfs-metadata-button value="In the Scrapbooks" 
+										:click="switchToPlacePage">
+											<img :src="openBookIcon" title="Find this place in the scrapbooks" height="30" style="padding-top: 0.35em; vertical-align: sub;"/>
+										</wfs-metadata-button>
+									</b-col>
+								</b-row>								
 							</div>
 						</b-collapse>
 
@@ -73,6 +101,7 @@ import bCollapse from "bootstrap-vue/es/components/collapse/collapse";
 
 // WFS components
 import wfsMetadata from "./wfs_metadata.vue";
+import wfsMetadataButton from "./wfs_metadata_button.vue";
 
 // Third party VueJS components
 import Icon from "vue-awesome/components/Icon";
@@ -84,7 +113,11 @@ export default {
 
 	name: "wfs-place-card",
 
-	props: ["cp", "json", "occurrences", "occurrenceText", "previousPage", "switchmethod"],
+	props: ["cp", 
+			"json", 
+			"occurrences", 
+			"occurrenceText", 
+			"switchMethod"],
 
 	components: {
 
@@ -97,6 +130,8 @@ export default {
         "b-col": bCol,		
 
 		"wfs-metadata": wfsMetadata,
+		"wfs-metadata-button": wfsMetadataButton,
+
 		"icon": Icon,
 	},
 
@@ -105,7 +140,7 @@ export default {
 		return {
 
 			showCollapse: true,
-			openBookIcon: "/src/assets/images/open_book_icon.png",
+			openBookIcon: "/src/assets/images/open_book_icon_white.png",
 		}
 	},
 
@@ -149,18 +184,17 @@ export default {
 
 		switchToPlacePage: function() {
 
+			console.log("switchToPlacePage");
+
 			// Save place JSON for reference
 			this.cp.currentPlace = this.json;
 
-			// Save previous page type to page level
-			this.cp.previousPage = this.previousPage;
-
             // Push route
-            this.$router.push({ name: "Place", 
+            this.$router.push({ name: "place", 
                                 params: { placeID: this.cp.currentPlace.id } });
 
 			// Switch to the place page
-			this.switchmethod("wfs-place");
+			this.switchMethod("wfs-place");
 		},
 	},
 }
@@ -169,13 +203,21 @@ export default {
 
 <style>
 
+.wfs_card_button {
+
+	margin: 0.25em 0.25em 0.125em 0.125em;
+	padding: 0.25em 0.45em 0.25em 0.45em;
+}
+
 .wfs_card_custom {
+
 	background-color: rgba(0,0,0,0);
 	border: 0;
 	border-radius: 0;
 }
 
 .card-body {
+
 	padding: 0em !important;
 }
 

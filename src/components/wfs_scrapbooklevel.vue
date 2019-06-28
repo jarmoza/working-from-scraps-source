@@ -225,7 +225,9 @@ export default {
             } else {
                 vm.currentlyExaminedEntry = "Collection";
                 vm.setNavbarToCollectionColor();
-                vm.setBackgroundColorToPageColor();
+                if ( vm.setBackgroundColorToPageColor ){
+                    vm.setBackgroundColorToPageColor();
+                }
             }
             // vm.pickCollectionOrBook(vm.$route.path, vm.$route.params);
         });

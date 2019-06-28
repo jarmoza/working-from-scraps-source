@@ -173,7 +173,7 @@ export default {
                         });
                     } else { 
 
-                        console.log("Setting to collection");
+                        console.log("Setting to collection"); 
 
                         this.setNavbarToCollectionColor();
                         this.setBackgroundColorToPageColor();

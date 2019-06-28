@@ -232,7 +232,7 @@ import wfsPPSKDataArea from "./wfs_ppsk_data_area.vue";
 // Third party components
 import wfsReadMore from "./wfs_read_more.vue";
 import Icon from "vue-awesome/components/Icon";
-import "vue-awesome/icons/Search";
+import "vue-awesome/icons/search"
 
 
 export default {

@@ -207,7 +207,7 @@ import wfsSourceCard from "./wfs_source_card.vue";
 
 // Third party components
 import Icon from "vue-awesome/components/Icon";
-import "vue-awesome/icons/Search";
+import "vue-awesome/icons/search"
 
 
 export default {

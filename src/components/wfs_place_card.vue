@@ -105,8 +105,8 @@ import wfsMetadataButton from "./wfs_metadata_button.vue";
 
 // Third party VueJS components
 import Icon from "vue-awesome/components/Icon";
-import "vue-awesome/icons/Angle-Left";
-import "vue-awesome/icons/Angle-Down";
+import "vue-awesome/icons/angle-left";
+import "vue-awesome/icons/angle-down";
 
 
 export default {

@@ -174,10 +174,10 @@ import wfsSourceCard from "./wfs_source_card.vue";
 import wfsReadMore from "./wfs_read_more.vue";
 import Icon from "vue-awesome/components/Icon.vue";
 import "vue-awesome/icons/arrow-circle-left";
-import "vue-awesome/icons/Angle-Left";
-import "vue-awesome/icons/Angle-Right";
-import "vue-awesome/icons/Angle-Double-Left";
-import "vue-awesome/icons/Angle-Double-Right";
+import "vue-awesome/icons/angle-left";
+import "vue-awesome/icons/angle-right";
+import "vue-awesome/icons/angle-double-left";
+import "vue-awesome/icons/angle-double-right";
 
 
 export default {

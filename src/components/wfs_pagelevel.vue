@@ -172,7 +172,7 @@ import wfsSourceCard from "./wfs_source_card.vue";
 
 // Third party VueJS components
 import wfsReadMore from "./wfs_read_more.vue";
-import Icon from "vue-awesome/components/Icon";
+import Icon from "vue-awesome/components/Icon.vue";
 import "vue-awesome/icons/arrow-circle-left";
 import "vue-awesome/icons/Angle-Left";
 import "vue-awesome/icons/Angle-Right";

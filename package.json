@@ -11,8 +11,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "bootstrap-vue": "^2.0.0-rc.12",
-    "chart.js": "^2.7.2",
+    "bootstrap-vue": "^2.0.0-rc.2",
+    "chart.js": "^2.9.4",
     "chartist": "^0.11.0",
     "chartist-plugin-tooltip": "0.0.11",
     "express": "^4.17.1",

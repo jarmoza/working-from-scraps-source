@@ -1,1 +1,1 @@
-[Working from Scraps Prototype](https://working-from-scraps.herokuapp.com)
+[Working from Scraps Demo Video](https://vimeo.com/379640956)
